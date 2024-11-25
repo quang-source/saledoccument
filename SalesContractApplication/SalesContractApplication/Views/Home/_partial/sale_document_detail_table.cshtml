@@ -1,0 +1,94 @@
+@model SalesContractApplication.Models.SalesDocumentViewModel
+@{
+    var id = ViewBag.Id;
+    var str = "subtable_" + id;
+}
+
+<table id="@str" class="table-bordered mytable">
+    <thead >
+        <tr>
+            <th data-field="state" data-checkbox="true"></th>
+            <th data-field="sales_document_line_id" data-visible="false"> ID</th>
+            <th data-field="sales_document_id" data-visible="false"> ID</th>
+            <th data-sortable="true">Cust Ref</th>
+            <th data-sortable="true" data-align="center" >Product ID</th>
+            <th data-sortable="true" data-align="center">Material</th>
+            <th data-sortable="true" data-align="right" data-footer-formatter="TotalFormatter">Qty</th>
+            <th data-sortable="true" data-align="right" data-footer-formatter="TotalFormatter">Ship</th>
+            <th data-sortable="true" data-align="right" data-footer-formatter="TotalFormatter">Cancel</th>
+            <th data-sortable="true" data-align="right">Unit Price</th>
+            <th data-sortable="true" data-align="right" data-footer-formatter="TotalFormatter">Amount</th>
+            <th data-sortable="true" data-align="center">Order Type</th>
+            <th data-sortable="true">Stamp</th>
+            <th data-sortable="true">Remark</th>
+            <th data-field="status_description" data-sortable="true" data-align="center">Status</th>
+            <th data-events="window.detailEvents"></th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @{
+            foreach (var item in Model.SalesDocumentLines)
+            {
+                <tr>
+                    <th data-field="state" data-checkbox="true"></th>
+                    <td>@item.SalesDocumentLineId</td>
+                    <td>@item.SalesDocumentId</td>
+                    <td>
+                        @item.CustomerReference
+                    </td>
+                    <td>
+                        @item.ProductIDSize
+                    </td>
+                    <td>
+                        @item.LOP
+                    </td>
+                    <td>
+                       @item.Quantity
+                    </td>
+                    <td>
+                        @item.QuantityShipped
+                    </td>
+                    <td>
+                        @item.QuantityCancelled
+                    </td>
+                    <td>
+                        @if (item.Currency == "USD")
+                        {
+                            @Html.Raw("$");
+                        }
+                        else
+                        {
+                            @Html.Raw("€");
+                        }
+                        @item.UnitPrice
+                        @if (item.Currency == "VND")
+                        {
+                            @Html.Raw("VND");
+                        }
+                    </td>
+                    <td>
+                        @item.Amount
+                    </td>
+                    <td>
+                        @item.OrderType
+                    </td>
+                    <td>
+                        @item.Stamp
+                    </td>
+                    <td>
+                        @item.Remark
+                    </td>
+                    <td>
+                        @item.StatusDescription
+                    </td>
+                    <td>
+                        <a class="remove color-red" href="javascript:void(0)" title="Remove">
+                            <i class="fa fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

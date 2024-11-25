@@ -1,0 +1,615 @@
+﻿@model SalesContractApplication.Models.SalesHistoryViewModel
+
+@{
+
+}
+
+<!-- Main Container -->
+<div class="container-fluid">
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="invoice-data-tab" data-bs-toggle="tab" data-bs-target="#invoice-data-panel" type="button" role="tab" aria-controls="invoice-data-panel" aria-selected="true">Invoice Data</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="old-sales-tab" data-bs-toggle="tab" data-bs-target="#old-sales-panel" type="button" role="tab" aria-controls="old-sales-panel" aria-selected="false">Old Sales</button>
+        </li>
+    </ul>
+    <div class="tab-content border p-2" id="myTabContent">
+        <!-- Invoice Data panel -->
+        <div class="tab-pane fade show active" id="invoice-data-panel" role="tabpanel" aria-labelledby="invoice-data-tab">
+            <div class="row">
+                <!-- Filter Section -->
+                <div class="col-md-2" style="height:100vh;overflow-y:auto">
+                    <h5>Select Conditions</h5>
+
+                    <!-- Radio buttons -->
+                    <div class="mb-3">
+                        <div>
+                            <input id="radio_sales_order" type="radio" class="form-check-input" name="radio_filter" value="sales_order_id" checked>
+                            <label for="radio_sales_order">Sale Order</label>
+                        </div>
+                        <div>
+                            <input id="radio_order_line" type="radio" class="form-check-input" name="radio_filter" value="sales_order_line_id">
+                            <label for="radio_order_line">Order Line</label>
+                        </div>
+                        <div>
+                            <input id="radio_customer_order" type="radio" class="form-check-input" name="radio_filter" value="customer_purchases_order">
+                            <label for="radio_customer_order">Customer Order</label>
+                        </div>
+                        <div>
+                            <input id="radio_customer_reference" type="radio" class="form-check-input" name="radio_filter" value="customer_reference">
+                            <label for="radio_customer_reference">Customer Reference</label>
+                        </div>
+                        <div>
+                            <input id="radio_tax_number" type="radio" class="form-check-input" name="radio_filter" value="tax_invoice_number">
+                            <label for="radio_tax_number">Tax Number</label>
+                        </div>
+                        <div>
+                            <input id="radio_reference" type="radio" class="form-check-input" name="radio_filter" value="produced_product_id">
+                            <label for="radio_reference">Reference</label>
+                        </div>
+                        <div>
+                            <input id="radio_mo" type="radio" class="form-check-input" name="radio_filter" value="manufacturing_order_id">
+                            <label for="radio_mo">MO</label>
+                        </div>
+                        <div>
+                            <input id="radio_pon" type="radio" class="form-check-input" name="radio_filter" value="procedure_out_number">
+                            <label for="radio_pon">PON</label>
+                        </div>
+                        <div>
+                            <input id="radio_drawing_no" type="radio" class="form-check-input" name="radio_filter" value="mitmas_CSYTAB.MMDWNO">
+                            <label for="radio_drawing_no">Drawing No</label>
+                        </div>
+                        <div>
+                            <input id="radio_brand_name" type="radio" class="form-check-input" name="radio_filter" value="brandname">
+                            <label for="radio_brand_name">Brand Name</label>
+                            <select id="brandname" name="" class="form-control multi-select" multiple="multiple">
+                                @foreach (var opt in Model.BrandNames)
+                                {
+                                    <option value='@opt.Value'>@opt.Text</option>
+                                }
+                            </select>
+                        </div>
+                        <div>
+                            <input id="radio_brand_code" type="radio" class="form-check-input" name="radio_filter" value="brandcode">
+                            <label for="radio_brand_code">Brand Code</label>
+                            <select id="brandcode" name="" class="form-control multi-select" multiple="multiple">
+                                @foreach (var opt in Model.BrandCodes)
+                                {
+                                    <option value='@opt.Value'>@opt.Text</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-end">
+                        <button id="btn_paste" class="btn btn-secondary me-2">Paste</button>
+                        <button id="btn_reset" class="btn btn-outline-secondary">Reset</button>
+                    </div>
+
+                    <!-- Grid -->
+                    <div class="mt-3">
+                        <table id="condition_data_grid" class="table table-bordered">
+                            <thead>
+                                <tr><th id="grid_header">...</th></tr>
+                            </thead>
+                            <tbody id="grid_body">
+                                <tr><td><input type="text" id="input_cell" class="form-control" placeholder="Manually input here then 'Enter'" /></td></tr>
+                                <div id="dynamic_grid"></div>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Data Section -->
+                <div class="col-md-10">
+                    <!-- Extra Filters Section -->
+                    <div class=" mb-4">
+                        <div class="row my-2">
+                            <div class="col-md-5">
+                                <div class="form-group row">
+                                    <label for="salesGrouping" class="form-label col-form-label col-sm-3">Sales Grouping:</label>
+                                    <div class="col-sm-9">
+                                        <select id="salesGrouping" class="form-control multi-select" multiple="multiple">
+                                            @* <option value="AURO">AURO</option>
+                                            <option value="OTHERS">OTHERS</option>
+                                            <option value="CBME">CBME</option>
+                                            <option value="MRM">MRM</option>
+                                            <option value="LOCAL">LOCAL</option> *@
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Buttons -->
+                            <div class="col-md-3">
+                                <div class="d-flex">
+                                    <button id="btn_show" class="btn btn-primary me-2"><i class="fa fa-search"></i> Show Data</button>
+                                    <button id="btn_export" class="btn btn-outline-success"><i class="fa fa-file-export"></i> Export</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row my-2" id="row_of_customer">
+                            <div class="col-md-5">
+                                <div class="form-group row">
+                                    <label for="customer" class="form-label col-form-label col-sm-3">Customer:</label>
+                                    <div class="col-sm-9">
+                                        <select id="customer" class="form-control single-select">
+                                            <option value="9999">-- All Customers --</option>
+                                            @foreach (var opt in Model.Customers)
+                                            {
+                                                <option value='@opt.Value'>@opt.Text</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row my-2" id="row_of_division" style="display:none;">
+                            <div class="col-md-5">
+                                <div class="form-group row">
+                                    <label for="division" class="form-label col-form-label col-sm-3">Division:</label>
+                                    <div class="col-sm-9">
+                                        <select id="division" class="form-control single-select">
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row my-2">
+                            <div class="col-md-3">
+                                <div class="form-group row">
+                                    <label for="dateFrom" class="form-label col-form-label col-sm-5">Invoiced From</label>
+                                    <div class="col-sm-7">
+                                        <input type="date" id="dateFrom" name="dateFrom" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group row">
+                                    <label for="dateTo" class="form-label col-form-label col-sm-1">To</label>
+                                    <div class="col-sm-7">
+                                        <input type="date" id="dateTo" name="dateTo" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="container_invoice_data_table" class="">
+                        @Html.Partial("_partial/invoice_data_table", Model)
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Old Sales panel -->
+        <div class="tab-pane fade" id="old-sales-panel" role="tabpanel" aria-labelledby="old-sales-tab">
+            <div class="row">
+                <!-- Filter Section -->
+                <div class="col-md-2" style="height:100vh;overflow-y:auto">
+                    <h5>Select Conditions</h5>
+
+                    <div class="mb-3">
+                        <div>
+                            <input id="radio_ref" type="radio" class="form-check-input" name="radio_filter_2" value="reference" checked>
+                            <label for="radio_ref">Reference</label>
+                        </div>
+                        <div>
+                            <input id="radio_dwno" type="radio" class="form-check-input" name="radio_filter_2" value="dwno">
+                            <label for="radio_dwno">Drawing No</label>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button id="btn_paste_2" class="btn btn-secondary me-2">Paste</button>
+                        <button id="btn_reset_2" class="btn btn-outline-secondary">Reset</button>
+                    </div>
+                    <div class="mt-3">
+                        <table id="condition_data_grid_2" class="table table-bordered">
+                            <thead>
+                                <tr><th id="grid_header_2">...</th></tr>
+                            </thead>
+                            <tbody id="grid_body_2">
+                                <tr><td><input type="text" id="input_cell_2" class="form-control" placeholder="Manually input here then 'Enter'" /></td></tr>
+                                <div id="dynamic_grid_2"></div>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Data Section -->
+                <div class="col-md-10">
+                    <div class=" mb-4">
+                        <div class="row my-2">
+                            <div class="col-md-5">
+                                <div class="d-flex">
+                                    <button id="btn_show_2" class="btn btn-primary me-2"><i class="fa fa-search"></i> Show Data</button>
+                                    <button id="btn_export_2" class="btn btn-outline-success"><i class="fa fa-file-export"></i> Export</button>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="container_sales_history_table" class="">
+                        @Html.Partial("_partial/sales_history_table", Model)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+</div>
+
+
+@section Scripts {
+    <script>
+        this.runningFormatter = function (value, row, index) {
+            $table = $('#invoice-data-table');
+            var tableOptions = $table.bootstrapTable('getOptions');
+            rowIndex = ((tableOptions.pageNumber - 1) * tableOptions.pageSize) + (1 + index);
+            row.row_index = rowIndex;
+            return rowIndex;
+        };
+        this.runningFormatter2 = function (value, row, index) {
+            $table = $('#sales-history-table');
+            var tableOptions = $table.bootstrapTable('getOptions');
+            rowIndex = ((tableOptions.pageNumber - 1) * tableOptions.pageSize) + (1 + index);
+            row.row_index = rowIndex;
+            return rowIndex;
+        };
+
+        var selected_radio_value = "";
+        var selected_radio_value_2 = "";
+        function updateGridHeader(radio_name, header_id) {
+            var selected_radio = document.querySelector(`input[name="${radio_name}"]:checked`);
+            if (selected_radio) {
+                // var selected_filter = selected_radio.nextSibling.textContent.trim();
+                var label = selected_radio.nextElementSibling;
+                if (label) {
+                    var selected_filter = label.textContent.trim();
+                    document.getElementById(header_id).innerText = selected_filter;
+                }
+                return selected_radio.value;
+            }
+            return "";
+        }
+        selected_radio_value = updateGridHeader('radio_filter', 'grid_header');
+        selected_radio_value_2 = updateGridHeader('radio_filter_2', 'grid_header_2');
+
+        document.querySelectorAll('input[name="radio_filter"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                selected_radio_value = updateGridHeader('radio_filter', 'grid_header');
+            });
+        });
+
+        document.querySelectorAll('input[name="radio_filter_2"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                selected_radio_value_2 = updateGridHeader('radio_filter_2', 'grid_header_2');
+            });
+        });
+
+        function inputCellEnter(e, input_cell, grid_body_id) {
+            if (e.key === 'Enter') {
+                const inputValue = input_cell.value.trim();
+                if (inputValue) {
+                    const newRow = document.createElement('tr');
+                    newRow.innerHTML = `<td>${inputValue}</td>`;
+                    document.getElementById(grid_body_id).appendChild(newRow);
+                    input_cell.value = '';
+                }
+            }
+        }
+        document.getElementById('input_cell').addEventListener('keypress', function (e) {
+            inputCellEnter(e, this, 'grid_body');
+        });
+        document.getElementById('input_cell_2').addEventListener('keypress', function (e) {
+            inputCellEnter(e, this, 'grid_body_2');
+        });
+
+        function handlePasteButtonClick(button_id, grid_body_id) {
+            document.getElementById(button_id).addEventListener('click', function () {
+                navigator.clipboard.readText().then(text => {
+                    const rows = text.split('\n').filter(row => row.trim() !== '');
+
+                    rows.forEach(row => {
+                        const newRow = document.createElement('tr');
+                        newRow.innerHTML = `<td>${row.trim()}</td>`;
+                        document.getElementById(grid_body_id).appendChild(newRow);
+                    });
+                }).catch(err => {
+                    console.error('Failed to read clipboard contents: ', err);
+                });
+            });
+        }
+        handlePasteButtonClick('btn_paste', 'grid_body');
+        handlePasteButtonClick('btn_paste_2', 'grid_body_2');
+
+        function handleResetButtonClick(button_id, grid_body_id, input_cell_id) {
+            document.getElementById(button_id).addEventListener('click', function () {
+                document.getElementById(grid_body_id).innerHTML = `
+                                                                <tr>
+                                                                            <td><input type="text" id="${input_cell_id}" class="form-control" placeholder="Manually input here then 'Enter'" /></td>
+                                                                </tr>
+                                                            `;
+                updateGridHeader();
+
+                document.getElementById(input_cell_id).addEventListener('keypress', function (e) {
+                    if (e.key === 'Enter') {
+                        const inputValue = this.value.trim();
+                        if (inputValue) {
+                            const newRow = document.createElement('tr');
+                            newRow.innerHTML = `<td>${inputValue}</td>`;
+                            document.getElementById(grid_body_id).appendChild(newRow);
+                            this.value = '';
+                        }
+                    }
+                });
+            });
+        }
+        handleResetButtonClick('btn_reset', 'grid_body', 'input_cell');
+        handleResetButtonClick('btn_reset_2', 'grid_body_2', 'input_cell_2');
+
+        function getDataInGridSearch(radio_value, grid_body_id) {
+            var searchText = "";
+
+            if (radio_value == "brandname" || radio_value == "brandcode") {
+                var selectedOptions = Array.from(document.getElementById(radio_value).selectedOptions);
+                searchText = selectedOptions.map(option => `'${option.textContent}'`).join(",");
+            }
+            else {
+                var gridRows = document.querySelectorAll(`#${grid_body_id} tr td`);
+                var gridValues = Array.from(gridRows)
+                    .map(cell => cell.textContent.trim())
+                    .filter(text => text !== "");  // Exclude any empty cells
+
+                if (radio_value == 'manufacturing_order_id') {
+                    gridValues = gridValues.map(value => value.replace(/[^0-9]/g, '')).filter(value => value != '');
+                }
+
+                searchText = gridValues.map(value => `'${value}'`).join(",");
+            }
+
+            return searchText;
+        }
+
+        $(document).ready(function () {
+            $('#customer').change(function () {
+                const customerValue = $(this).val();
+                const division_row = $('#row_of_division');
+
+                if (customerValue == '1878') {
+                    $.ajax({
+                        url: '@Url.Action("GetDivisions", "SalesHistory")',
+                        type: 'GET',
+                        data: { customerID: customerValue },
+                        dataType: 'json',
+                        success: function (data) {
+                            division_row.show();
+                            const division_select = $('#division');
+
+                            division_select.empty().append('<option value="ALL">-- All Divisions --</option>');
+
+                            $.each(data, function (index, division) {
+                                division_select.append($('<option>', {
+                                    value: division.value,
+                                    text: division.text
+                                }));
+                            });
+                        },
+                        error: function (xhr, status, error) {
+                            division_row.hide();
+                            console.error('Error fetching divisions:', error);
+                        }
+                    });
+                } else {
+                    division_row.hide();
+                    $('#division').empty();
+                }
+            });
+
+            $('#btn_show').click(function () {
+                var searchText = getDataInGridSearch(selected_radio_value, 'grid_body');
+                var columnToFind = "";
+                var columnToFind2 = "";
+                var customerFilter = "";
+                var dateFilter = "";
+
+                if (searchText) {
+                    if (selected_radio_value == "brandname" || selected_radio_value == "brandcode") {
+                        columnToFind2 = `and ${selected_radio_value} in (${searchText})`;
+                    }
+                    else {
+                        columnToFind = `and ${selected_radio_value} in (${searchText})`;
+                    }
+                }
+
+                var customer_id = $('#customer').val();
+                if (customer_id) {
+                    customerFilter = ` and ('${customer_id}' = 9999 or s.customer_id::text = any(string_to_array('${customer_id}', ',')))`;
+                    if (customer_id == "1878") {
+                        var division = $('#division').val();
+                        customerFilter += ` and ('${division}' = 'ALL' or sil.division = '${division}')`;
+                    }
+                }
+
+                var dateFrom = $('#dateFrom').val();
+                var dateTo = $('#dateTo').val();
+                if (dateFrom && dateTo) {
+                    dateFilter = ` and invoice_date between '${dateFrom}' and ('${dateTo}'::date + interval '1' day + interval '-1' second)`;
+                }
+
+                $('#splash_screen').toggleClass('hidden');
+                $.ajax({
+                    url: '@Url.Action("GetInvoiceData", "SalesHistory")',
+                    type: 'POST',
+                    data: {
+                        columnToFind: columnToFind,
+                        columnToFind2: columnToFind2,
+                        customerFilter: customerFilter,
+                        dateFilter: dateFilter
+                    },
+                    success: function (response) {
+                        $('#splash_screen').toggleClass('hidden');
+                        if (response.error) {
+                            console.error('Failed to get invoice data: ' + response.error);
+                            return;
+                        }
+
+                        $('#container_invoice_data_table').html(response);
+                    },
+                    error: function (xhr, status, error) {
+                        $('#splash_screen').toggleClass('hidden');
+                        console.error('An error occurred: ' + error);
+                    }
+                }).done(function () {
+                    $('#container_invoice_data_table').find('table').bootstrapTable();
+                });
+            });
+
+            $('#btn_export').click(function () {
+                const rowCount = document.querySelectorAll("#container_invoice_data_table table tbody tr").length;
+                if (rowCount > 0) {
+                    // Extract headers
+                    const headers = Array.from(document.querySelectorAll("#invoice-data-table thead th"))
+                        .map(th => th.innerText);
+
+                    // Extract data rows
+                    const invoiceDataList = Array.from(document.querySelectorAll("#invoice-data-table tbody tr"))
+                        .map(tr => {
+                            return Array.from(tr.children).map(td => td.innerText);
+                        });
+                    const invoiceData = invoiceDataList.map(row => {
+                        return headers.reduce((obj, header, index) => {
+                            obj[header] = row[index];
+                            return obj;
+                        }, {});
+                    });
+
+                    $('#splash_screen').toggleClass('hidden');
+                    $.ajax({
+                        url: '@Url.Action("ExportToExcel", "SalesHistory")',
+                        type: 'POST',
+                        data: {
+                            headers: JSON.stringify(headers),
+                            data: JSON.stringify(invoiceData)
+                        },
+                        success: function (response) {
+                            $('#splash_screen').toggleClass('hidden');
+                            console.log('Export successful:', response);
+                            if (response.success && response.fileData) {
+                                const date = new Date();
+                                const formattedDate = date.toISOString().slice(4, 10).replace(/-/g, ''); // Get yyMMdd format
+
+                                const link = document.createElement('a');
+                                link.href = 'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,' + response.fileData;
+                                link.download = `InvoiceData - exp ${formattedDate}.xlsx`;
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            $('#splash_screen').toggleClass('hidden');
+                            console.error('An error occurred: ' + error);
+                            alert("Failed to export data. Please try again.");
+                        }
+                    });
+                } else {
+                    alert("No data to export.");
+                }
+            });
+
+            $('#btn_show_2').click(function () {
+                var searchText = getDataInGridSearch(selected_radio_value_2, 'grid_body_2');
+                var filter_by_dwno = selected_radio_value_2 == "dwno";
+
+                var search_list = searchText.replace(/'/g, '').split(',');
+
+                $('#splash_screen').toggleClass('hidden');
+                $.ajax({
+                    url: '@Url.Action("GetOldSales", "SalesHistory")',
+                    type: 'POST',
+                    data: {
+                        filterByDwno: filter_by_dwno,
+                        strings: JSON.stringify(search_list)
+                    },
+                    success: function (response) {
+                        $('#splash_screen').toggleClass('hidden');
+
+                        if (response.error) {
+                            console.error('Failed to get sales history: ' + response.error);
+                            return;
+                        }
+
+                        $('#container_sales_history_table').html(response);
+                    },
+                    error: function (xhr, status, error) {
+                        $('#splash_screen').toggleClass('hidden');
+                        console.error('An error occurred: ' + error);
+                    }
+                }).done(function () {
+                    $('#container_sales_history_table').find('table').bootstrapTable();
+                });
+            });
+
+            $('#btn_export_2').click(function () {
+                const rowCount = document.querySelectorAll("#container_sales_history_table table tbody tr").length;
+                if (rowCount > 0) {
+                    // Extract headers
+                    const headers = Array.from(document.querySelectorAll("#sales-history-table thead th"))
+                        .map(th => th.innerText);
+
+                    // Extract data rows
+                    const salesList = Array.from(document.querySelectorAll("#sales-history-table tbody tr"))
+                        .map(tr => {
+                            return Array.from(tr.children).map(td => td.innerText);
+                        });
+                    const salesData = salesList.map(row => {
+                        return headers.reduce((obj, header, index) => {
+                            obj[header] = row[index];
+                            return obj;
+                        }, {});
+                    });
+
+                    $('#splash_screen').toggleClass('hidden');
+                    $.ajax({
+                        url: '@Url.Action("ExportToExcel", "SalesHistory")',
+                        type: 'POST',
+                        data: {
+                            headers: JSON.stringify(headers),
+                            data: JSON.stringify(salesData)
+                        },
+                        success: function (response) {
+                            $('#splash_screen').toggleClass('hidden');
+                            console.log('Export successful:', response);
+                            if (response.success && response.fileData) {
+                                const date = new Date();
+                                const formattedDate = date.toISOString().slice(0, 10).replace(/-/g, ''); // Get yyyyMMdd format
+
+                                const link = document.createElement('a');
+                                link.href = 'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,' + response.fileData;
+                                link.download = `Sales History ${formattedDate}.xlsx`;
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            $('#splash_screen').toggleClass('hidden');
+                            console.error('An error occurred: ' + error);
+                            alert("Failed to export data. Please try again.");
+                        }
+                    });
+                } else {
+                    alert("No data to export.");
+                }
+            });
+        });
+    </script>
+}

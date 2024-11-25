@@ -1,0 +1,143 @@
+﻿@model SalesContractApplication.Models.SalesHistoryViewModel
+
+@{
+    var str = "sales-history-table";
+}
+
+@if (Model.InvoiceDataList != null)
+{
+    <div class="col-sm-4 ">
+        <div id="toolbar"></div>
+    </div>
+    <table id="@str" class="table-bordered mytable"
+           data-search="true"
+           data-search-highlight="true"
+           data-click-to-select="true"
+           data-toggle="table"
+           data-show-footer="false"
+           data-footer-style="footerStyle"
+           data-show-export="true"
+           data-toolbar="#toolbar"
+    @* data-height="460"
+       data-pagination="true"
+       data-page-size="20"
+       data-id-field="id"
+       data-show-columns="true"
+       data-page-list="[10, 25, 50, 100, all]"*@>
+        <thead>
+            <tr>
+                <th data-formatter="runningFormatter2" data-field="row_index" data-width="20" data-align="center">No.</th>
+
+                <th data-sortable="true" data-align="center">Invoice Number</th>
+                <th data-sortable="true" data-align="center">Tax invoice Number</th>
+                <th data-sortable="true" data-align="center">PON</th>
+                <th data-sortable="true" data-align="center">Invoice Type</th>
+                <th data-sortable="true" data-align="center">Customer</th>
+
+                <th data-sortable="true" data-align="center">SalesGrouping</th>
+                <th data-sortable="true" data-align="center">Client Code</th>
+                <th data-sortable="true" data-align="center">Client Name</th>
+                <th data-sortable="true" data-align="center">LOP</th>
+                <th data-sortable="true" data-align="center">PO</th>
+
+                <th data-sortable="true" data-align="center">OrderID</th>
+                <th data-sortable="true" data-align="center">Invoice Date</th>
+                <th data-sortable="true" data-align="center">Invoice Description</th>
+                <th data-sortable="true" data-align="center" data-width="130">Invoice To Address</th>
+                <th data-sortable="true" data-align="center" data-width="130">Ship To Address</th>
+
+                <th data-sortable="true" data-align="center">Reference</th>
+                <th data-sortable="true" data-align="center">ITDS</th>
+                <th data-sortable="true" data-align="center">Qty</th>
+                <th data-sortable="true" data-align="center">Unit Price</th>
+                <th data-sortable="true" data-align="center">Unit</th>
+
+                <th data-sortable="true" data-align="center">Weight</th>
+                <th data-sortable="true" data-align="center">Metal</th>
+                <th data-sortable="true" data-align="center">Diamonds</th>
+                <th data-sortable="true" data-align="center">Stones</th>
+
+                <th data-sortable="true" data-align="center">CRMetal</th>
+                <th data-sortable="true" data-align="center">CRFindings</th>
+                <th data-sortable="true" data-align="center">CRStones</th>
+                <th data-sortable="true" data-align="center">CRDiamonds</th>
+                <th data-sortable="true" data-align="center">CRTimes</th>
+                <th data-sortable="true" data-align="center">Other Cost</th>
+                <th data-sortable="true" data-align="center">Discount/Markup Rate</th>
+
+                <th data-sortable="true" data-align="center">Gold price</th>
+                <th data-sortable="true" data-align="center">GoldPrice</th>
+                <th data-sortable="true" data-align="center">Silver price</th>
+                <th data-sortable="true" data-align="center">SilverPrice</th>
+
+                <th data-sortable="true" data-align="center">CustRef</th>
+                <th data-sortable="true" data-align="center">CustomerOrderNo</th>
+
+                @* <th data-events="window.operateEvents"></th> *@
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int index = 0;
+                foreach (var item in Model.OldSalesList)
+                {
+                    if (item != null)
+                    {
+                        <tr id="tr_@index">
+                            @* <td data-field="state" data-checkbox="true"><input type="checkbox" /></td> *@
+                            <td data-field="row_index"></td>
+
+                            <td>@item.InvoiceNumber</td>
+                            <td>@item.TaxInvoiceNumber</td>
+                            <td>@item.PON</td>
+                            <td>@item.InvoiceType</td>
+                            <td>@item.CustomerId</td>
+
+                            <td>@item.SalesGrouping</td>
+                            <td>@item.ClientCode</td>
+                            <td>@item.ClientName</td>
+                            <td>@item.LOP</td>
+                            <td>@item.PO</td>
+
+                            <td>@item.OrderID</td>
+                            <td>@item.InvoiceDate?.ToString("dd-MM-yyyy")</td>
+                            <td>@item.InvoiceDescription</td>
+                            <td class="text-truncate" style="white-space: nowrap; overflow-x: auto; max-width: 10%;">@item.InvoiceToAddress</td>
+                            <td class="text-truncate" style="white-space: nowrap; overflow-x: auto; max-width: 10%;">@item.ShipToAddress</td>
+
+                            <td>@item.Reference</td>
+                            <td>@item.ITDS</td>
+                            <td>@item.Qty</td>
+                            <td>@item.UnitPrice</td>
+                            <td>@item.Unit</td>
+
+                            <td>@item.Weight</td>
+                            <td>@item.Metal</td>
+                            <td>@item.Diamonds</td>
+                            <td>@item.Stones</td>
+
+                            <td>@item.CRMetal</td>
+                            <td>@item.CRFindings</td>
+                            <td>@item.CRStones</td>
+                            <td>@item.CRDiamonds</td>
+                            <td>@item.CRTimes</td>
+                            <td>@item.OtherCost</td>
+                            <td>@item.DiscountOrMarkupPriceRate</td>
+
+                            <td>@item.GoldPriceH</td>
+                            <td>@item.GoldPriceD</td>
+                            <td>@item.SilverPriceH</td>
+                            <td>@item.SilverPriceD</td>
+
+                            <td>@item.CustomerReference</td>
+                            <td>@item.CustomerOrderNumber</td>
+
+                        </tr>
+
+                        index++;
+                    }
+                }
+            }
+        </tbody>
+    </table>
+}

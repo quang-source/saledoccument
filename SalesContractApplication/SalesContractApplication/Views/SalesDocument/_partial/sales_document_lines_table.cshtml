@@ -1,0 +1,68 @@
+@model SalesContractApplication.Models.SalesDocumentViewModel
+
+@{
+    var str = "lines-table";
+}
+@if (Model.SalesDocumentLines != null)
+{
+
+    <table id="@str" class="table-bordered mytable"
+           data-search="true"
+           data-search-highlight="true"
+           data-click-to-select="true"
+           data-toggle="table"
+           data-show-footer="false"
+           data-footer-style="footerStyle"
+    @* data-height="460"
+       data-pagination="true"
+       data-page-size="20"
+       data-id-field="id"
+       data-show-columns="true"
+       data-page-list="[10, 25, 50, 100, all]"*@>
+        <thead>
+            <tr>
+                @*   <th data-field="state" data-checkbox="true"></th> *@
+                <th data-formatter="runningFormatter" data-field="row_index" data-width="20" data-align="center">No.</th>
+                <th data-field="sales_document_line_id">ID</th>
+                <th data-sortable="true">Cust Ref</th>
+                <th data-sortable="true" data-align="center" data-width="130">Product ID</th>
+                <th data-sortable="true" data-align="center" data-width="70"> Material</th>
+                <th data-sortable="true" data-align="right" data-footer-formatter="TotalFormatter" data-width="105">Qty</th>
+                <th data-sortable="true" data-align="center">uom</th>
+                <th data-sortable="true" data-align="right" data-width="120">Unit Price</th>
+                <th data-sortable="true" data-align="center">Currency</th>
+                <th data-sortable="true" data-align="center" data-width="100"> Type</th>
+                <th data-sortable="true">Stamp</th>
+                <th data-sortable="true">Remark</th>
+                <th data-sortable="true" data-align="center" data-width="250">Invoice To</th>
+                <th data-sortable="true" data-align="center" data-width="250">Ship To</th>
+                <th data-events="window.operateEvents"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int index = Model.FirstLineIndex;
+                // int index = 0;
+
+                foreach (var item in Model.SalesDocumentLines)
+                {
+                    if (item != null)
+                    {
+                        @Html.Partial("_partial/sales_document_lines_table_row", new
+                            {
+                                Line = item,
+                                Index = index,
+                                UOMs = Model.UOMs,
+                                Currencies = Model.Currencies,
+                                OrderTypes = Model.OrderTypes,
+                                InvoiceToAddresses = Model.InvoiceToAddresses,
+                                ShipToAddresses = Model.ShipToAddresses
+                            })
+                        index++;
+                    }
+                }
+            }
+        </tbody>
+    </table>
+
+}

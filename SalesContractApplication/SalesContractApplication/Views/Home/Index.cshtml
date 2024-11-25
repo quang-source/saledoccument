@@ -1,0 +1,472 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+    var now = DateTime.Now;
+    var fromDate = new DateTime(now.Year, now.Month, 1).ToString("yyyy-MM-dd");
+    var toDate = new DateTime(now.Year, 12, 31).ToString("yyyy-MM-dd");
+}
+
+<div class="container-fluid no-padding-left-right pb-10">
+    <div class="row align-items-center">
+        <div class="col-sm-4 content">
+            <a id="New" href="@Url.Action("CreateEdit","SalesDocument")" class="btn btn-primary">
+                <i class="fa fa-plus"></i> Add New
+            </a>
+            <button id="remove" class="btn btn-danger" disabled>
+                <i class="fa fa-trash"></i> Delete
+            </button>
+        </div>
+        <div class="col-sm-4 ">
+            <form id="filterForm" class="mt-3">
+                <div class="mb-3 row">
+                    <label for="fromDate" class="col-sm-2 col-form-label">From:</label>
+                    <div class="col-sm-3">
+                        <input type="date" class="form-control" id="fromDate" value="@fromDate">
+                    </div>
+                    <label for="toDate" class="col-sm-1 col-form-label">To:</label>
+                    <div class="col-sm-3">
+                        <input type="date" class="form-control" id="toDate" value="@toDate">
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label for="searchText" class="col-sm-2 col-form-label">Search:</label>
+                    <div class="col-sm-7">
+                        <input type="text" class="form-control" id="searchText" placeholder="Enter keyword" />
+                    </div>
+                    <div class="col-sm-3">
+                        <button type="submit" class="btn btn-primary w-100">Filter</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-4 ">
+            <div id="toolbar"></div>
+        </div>
+    </div>
+</div>
+<table id="table"
+@*data-height="800"*@
+       data-toolbar="#toolbar"
+       data-search="true"
+       data-search-highlight="true"
+       data-detail-view="true"
+       data-fixed-scroll="true"
+    @* data-search-align="left"
+       data-show-refresh="true"
+       data-show-toggle="true"
+       data-show-fullscreen="true" *@
+       data-show-columns="true" @*
+       data-show-columns-toggle-all="true" *@
+       data-detail-formatter="detailFormatter"
+       data-show-export="true"
+       data-show-pagination-switch="false"
+@* data-page-number="2" *@
+       data-click-to-select="true"
+       data-minimum-count-columns="2"
+       data-pagination="true"
+       data-page-size="20"
+       data-id-field="sales_document_id"
+       data-page-list="[10, 25, 50, 100, all]"
+       data-show-footer="true"
+@*data-side-pagination="server"*@
+       data-footer-style="footerStyle"
+       data-response-handler="responseHandler"></table>
+
+<script>
+    var $table = $('#table');
+    var $remove = $('#remove');
+    var selections = [];
+
+
+    function footerStyle(column) {
+        return {
+            sales_document_id: {
+                classes: 'uppercase'
+            },
+            document_code: {
+                css: { 'font-weight': 'normal' }
+            },
+            version: {
+                css: { color: 'red' }
+            }
+        }[column.field];
+    }
+    function responseHandler(res) {
+        $.each(res.rows, function (i, row) {
+            row.state = $.inArray(row.sales_document_id, selections) !== -1
+        })
+        return res
+    }
+    function operateFormatter(value, row, index) {
+        return [
+            '<a class="edit" href="@Url.Action("CreateEdit", "SalesDocument")/' + row.sales_document_id + '" title="Edit"><i class="fa fa-edit"></i></a>  ',
+            '<a class="copy" href="@Url.Action("Duplicate", "SalesDocument")/' + row.sales_document_id + '" title="Duplicate"><i class="fa fa-copy"></i></a>  ',
+            // '<a class="export" href="javascript:void(0)" title="export"><i class="fa fa-file-export"></i></a> ',
+            '<a class="color-red remove" href="javascript:void(0)" title="Remove"><i class="fa fa-trash"></i></a>'
+        ].join('')
+    }
+    function getIdSelections() {
+        return $.map($table.bootstrapTable('getSelections'), function (row) {
+            return row.sales_document_id;
+        })
+    }
+    window.detailEvents = {
+        'click .remove': function (e, value, row, index) {
+
+            $('#popupModalLabel').text('Confirm Deletion');
+            $('#modalBody').html('<span id="modalIcon" class="me-2"><i class="bi bi-exclamation-triangle-fill text-danger large-icon"></i></span>This line is status : ' + row.status_description + '.<br/> Are you sure you want to Cancel this item?');
+            $('#popupModal').modal('show');
+
+            $('#okButton').off('click').on('click', function () {
+                $detail_table = $('#subtable_' + row.sales_document_id)
+                $detail_table.bootstrapTable('showLoading')
+                $.ajax({
+                    url: '@Url.Action("DeleteSaleDocumentLine", "Home")',
+                    type: 'POST',
+                    data: {
+                        id: row.sales_document_line_id
+                    },
+                    success: function (result) {
+                        console.log(JSON.parse(result.data))
+                        if (result.success) {
+                            showToast('success', JSON.parse(result.data).message);
+                            $detail_table.bootstrapTable('remove', {
+                                field: 'sales_document_line_id',
+                                values: [row.sales_document_line_id]
+                            })
+                            var remainingRows = $detail_table.bootstrapTable('getData').length;
+                            if (remainingRows == 0) {
+                                alert(row.sales_document_id)
+                                $table.bootstrapTable('remove', {
+                                    field: 'sales_document_id',
+                                    values: [row.sales_document_id]
+                                });
+                            }
+
+                        } else {
+                            if (result.error == '[Error] METHOD NOT ALLOWED')
+                                showToast('error', 'Not allowed to cancel detail document when status is ' + row.status_description);
+
+                            else
+                                showToast('error', result.error);
+                        } $('#popupModal').modal('hide');
+                    },
+                    error: function (xhr, status, error) {
+                        console.log("xhr : " + xhr)
+                        console.log("status : " + status)
+                        console.log("error : " + error)
+                        alert("Error: " + error);
+                    }
+                }).done(function (result) {
+                    $detail_table.bootstrapTable('hideLoading')
+                });
+            });
+        }
+    }
+    $table.on('check.bs.table uncheck.bs.table ' +
+        'check-all.bs.table uncheck-all.bs.table',
+        function () {
+            $remove.prop('disabled', !$table.bootstrapTable('getSelections').length)
+
+            // save your data, here just save the current page
+            selections = getIdSelections()
+            // push or splice the selections if you want to save all data selections
+        })
+    $table.on('all.bs.table', function (e, name, args) {
+        //console.log(name, args)
+    })
+    $remove.click(function () {
+        var ids = getIdSelections()
+        $('#popupModalLabel').text('Confirm Deletion');
+        $('#modalBody').html('<span id="modalIcon" class="me-2"><i class="bi bi-exclamation-triangle-fill text-danger large-icon"></i></span>.<br/> Are you sure you want to Cancel this item?');
+
+        $('#popupModal').modal('show');
+        $('#okButton').off('click').on('click', function () {
+            $.each(ids, function (key, val) {
+                DeleteSaleDoccument(val, '')
+            });
+        });
+        $remove.prop('disabled', true)
+    })
+    function DeleteSaleDoccument(id, status) {
+        $table.bootstrapTable('showLoading')
+        $.ajax({
+            url: '@Url.Action("DeleteSaleDocumment", "Home")',
+            type: 'POST',
+            data: {
+                id: id
+            },
+            success: function (result) {
+                // console.log(result)
+                // console.log(JSON.parse(result.data))
+                if (result.success) {
+                    showToast('success', JSON.parse(result.data).message);
+                    $table.bootstrapTable('remove', {
+                        field: 'sales_document_id',
+                        values: [id]
+                    });
+
+                } else {
+                    if (result.error == '[Error] METHOD NOT ALLOWED')
+                        showToast('error', 'Not allowed to cancel document status ' + status);
+
+                    else
+                        showToast('error', result.error);
+                }
+
+                $('#popupModal').modal('hide');
+            },
+            error: function (xhr, status, error) {
+                console.log("xhr : " + xhr)
+                console.log("status : " + status)
+                console.log("error : " + error)
+                alert("Error: " + error);
+            }
+        }).done(function (result) {
+            $table.bootstrapTable('hideLoading')
+        });
+    }
+    window.operateEvents = {
+        'click .export': function (e, value, row, index) {
+            alert('You click export action, row: ' + JSON.stringify(row))
+        },
+        'click .remove': function (e, value, row, index) {
+
+            $('#popupModalLabel').text('Confirm Deletion');
+            $('#modalBody').html('<span id="modalIcon" class="me-2"><i class="bi bi-exclamation-triangle-fill text-danger large-icon"></i></span>' +
+                'This Sale doccument is status : ' + row.status_description + '.<br/> Are you sure you want to Cancel this item?');
+
+            $('#popupModal').modal('show');
+            $('#okButton').off('click').on('click', function () {
+                DeleteSaleDoccument(row.sales_document_id, row.status_description)
+            });
+        }
+    }
+    function totalTextFormatter(data) {
+        return 'Total';
+    }
+    function dateFormatter(value, row, index) {
+        if (value == "")
+            return '';
+        var date = new Date(value);
+        var day = String(date.getDate()).padStart(2, '0');
+        var month = String(date.getMonth() + 1).padStart(2, '0');
+        var year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    }
+    function dateTimeFormatter(value, row, index) {
+        if (value == "")
+            return '';
+        var date = new Date(value);
+        var day = String(date.getDate()).padStart(2, '0');
+        var month = String(date.getMonth() + 1).padStart(2, '0');
+        var year = date.getFullYear();
+        var hours = String(date.getHours()).padStart(2, '0');
+        var minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${day}/${month}/${year} ${hours}:${minutes}`;
+    }
+    function totalNameFormatter(data) {
+        return data.length
+    }
+    function totalPriceFormatter(data) {
+        var field = this.field
+        return '$' + data.map(function (row) {
+            return +row[field].substring(1)
+        }).reduce(function (sum, i) {
+            return sum + i
+        }, 0)
+    }
+    function TotalFormatter(data, footerValue) {
+        var field = this.field; // Get the field we are summing
+        var total = data.reduce(function (sum, row) {
+            return sum + (+row[field]); // Convert value to number and sum up
+        }, 0);
+        return total; // Return the total sum
+    }
+    function initTable(data) {
+
+        $table.bootstrapTable('destroy').bootstrapTable({
+            data: data,
+            searchSelector: "#searchText",
+            headerStyle: {
+                classes: 'headerStyle'
+            },
+            onDblClickRow: function (row, $element, field) {
+                window.location.href = '/SalesDocument/CreateEdit/' + row.sales_document_id;
+            },
+            detailFormatter: function (index, row) {
+                var html = []
+                $table.bootstrapTable('showLoading')
+                $.ajax({
+                    url: '@Url.Action("GetSaleDocummentlDetaiView", "Home")',
+                    type: 'POST',
+                    data: {
+                        id: row.sales_document_id
+                    },
+                    async: false,
+                    success: function (result) {
+                        html.push(result)
+                    },
+                    error: function (xhr, status, error) {
+                        console.log("xhr : " + xhr)
+                        console.log("status : " + status)
+                        console.log("error : " + error)
+                        alert("Error: " + error);
+                    }
+                }).done(function (result) {
+                    $table.bootstrapTable('hideLoading')
+                });
+                return html.join('')
+
+            },
+            onExpandRow: function (index, row, $detail) {
+                $detail.find('table').bootstrapTable({
+
+                    searchHighlight: "true",
+                    clickToSelect: true,
+                    pageSize: "15",
+                    showFooter: true,
+                    pageList: "[10, 25, 50, 100, all]",
+                    footerStyle: "footerStyle",
+                    idField: "sales_document_line_id",
+                    pagination: true,
+                    search: true
+                });
+            },
+            locale: 'en-US',
+            columns: [
+                [
+                    {
+                        field: 'state',
+                        checkbox: true,
+                        align: 'center',
+                        valign: 'middle'
+                    },
+                    {
+                        title: ' ID',
+                        field: 'sales_document_id',
+                        align: 'center',
+                        valign: 'middle',
+                        sortable: true,
+                        visible: false,
+                        width: 80,
+
+                    },
+                    {
+                        field: 'customer_name',
+                        title: 'Customer', footerFormatter: totalTextFormatter,
+                        width: 280,
+                        sortable: true,
+                        align: 'center'
+                    },
+                    {
+                        field: 'document_code',
+                        title: 'Code',
+                        sortable: true,
+                        footerFormatter: totalNameFormatter,
+                        align: 'center'
+                    },
+                    {
+                        field: 'version',
+                        title: 'Vers',
+                        sortable: true,
+                        align: 'center'
+                    },
+                    {
+                        field: 'purchase_order_number',
+                        title: 'PO',
+                        sortable: true,
+                        align: 'center'
+                    },
+                    {
+                        field: 'status_description',
+                        title: 'Status',
+                        sortable: true,
+                        align: 'center'
+                    },
+                    {
+                        field: 'document_valid_start',
+                        title: 'Valid from',
+                        sortable: true, formatter: dateFormatter,
+                        align: 'center'
+                    },
+                    {
+                        field: 'document_valid_end',
+                        title: 'Valid to',
+                        sortable: true, formatter: dateFormatter,
+                        align: 'center'
+                    },
+                    {
+                        field: 'gold_price',
+                        title: 'Gold price',
+                        sortable: true,
+                        align: 'center'
+                    },
+                    {
+                        field: 'silver_price',
+                        title: 'Silver price',
+                        sortable: true,
+                        align: 'center'
+                    },
+                    {
+                        field: 'created_date',
+                        title: 'Created date',
+                        sortable: true, formatter: dateTimeFormatter,
+                        align: 'center'
+                    },
+                    {
+                        field: 'created_by',
+                        title: 'Created by',
+                        sortable: true,
+                        align: 'center'
+                    },
+                    {
+                        field: 'operate',
+                        title: 'Operate',
+                        align: 'center',
+                        width: 130,
+                        clickToSelect: false,
+                        events: window.operateEvents,
+                        formatter: operateFormatter
+                    }
+                ],
+            ]
+        })
+
+    }
+
+    function loadData() {
+        dataSource = []
+        $.ajax({
+            url: '@Url.Action("GetSaleDocummentlList", "Home")',
+            data: {
+                "from_date": $('#fromDate').val(),
+                "to_date": $('#toDate').val(),
+                "filters": $('#searchText').val()
+            },
+            type: 'POST',
+            success: function (result) {
+                if (result.success) {
+                    var dataObject = JSON.parse(result.data);
+                    if (dataObject !== null) {
+                        dataSource = dataObject
+                    }
+                } else {
+                    showToast('error', result.error)
+                }
+            },
+            error: function (xhr, status, error) {
+                showToast('error', error)
+            }
+        }).done(function (result) {
+            initTable(dataSource)
+        });
+    }
+
+    $(function () {
+        loadData();
+        $('#filterForm').on('submit', function (event) {
+            event.preventDefault();
+            loadData();
+        });
+    })
+</script>

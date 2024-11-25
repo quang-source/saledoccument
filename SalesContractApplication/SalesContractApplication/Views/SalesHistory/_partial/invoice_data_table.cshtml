@@ -1,0 +1,125 @@
+﻿@model SalesContractApplication.Models.SalesHistoryViewModel
+
+@{
+    var str = "invoice-data-table";
+}
+
+@if (Model.InvoiceDataList != null)
+{
+
+    <table id="@str" class="table-bordered mytable"
+           data-search="true"
+           data-search-highlight="true"
+           data-click-to-select="true"
+           data-toggle="table"
+           data-show-footer="true"
+           data-footer-style="footerStyle"
+    @* data-height="460"
+       data-pagination="true"
+       data-page-size="20"
+       data-id-field="id"
+       data-show-columns="true"
+       data-page-list="[10, 25, 50, 100, all]"*@>
+        <thead>
+            <tr>
+                <th data-formatter="runningFormatter" data-field="row_index" data-width="20" data-align="center">No.</th>
+
+                <th data-sortable="true" class="hidden">Group</th>
+                <th data-sortable="true" class="hidden">CustCode</th>
+                <th data-sortable="true" data-align="center">Customer Name</th>  <!-- 1 -->
+                <th data-sortable="true" data-align="center">Order Date</th>
+                <th data-sortable="true" data-align="center">MO</th>
+                <th data-sortable="true" data-align="center">Priority</th>
+                <th data-sortable="true" data-align="center">Order ID</th>
+                <th data-sortable="true" data-align="center">Cust.Order</th>
+                <th data-sortable="true" data-align="center">Reference</th>
+                <th data-sortable="true" data-align="center">Cust Ref</th>
+                <th data-sortable="true" data-align="center">ITDS</th>
+                <th data-sortable="true" data-align="center">Drawing No</th>     <!-- 10 -->
+                <th data-sortable="true" data-align="center">LOP</th>
+                <th data-sortable="true" data-align="right" data-footer-formatter="TotalFormatter">Qty</th>
+                <th data-sortable="true" data-align="center">Unit</th>
+                <th data-sortable="true" data-align="right">Unit Price</th>
+                <th data-sortable="true" data-align="right" data-footer-formatter="TotalFormatter">Amount</th>
+                <th data-sortable="true" data-align="center">Item Type</th>
+                <th data-sortable="true" data-align="center">PON</th>
+                <th data-sortable="true" data-align="center">Invoice ID</th>
+                <th data-sortable="true" data-align="center">Tax No</th>
+                <th data-sortable="true" data-align="right" data-footer-formatter="TotalFormatter">Metal Weight</th>   <!-- 20 -->
+                <th data-sortable="true" data-align="right">AVG Unit Metal</th>
+                <th data-sortable="true" data-align="right" data-footer-formatter="TotalFormatter">Net Weight(g)</th>
+                <th data-sortable="true" data-align="right" data-footer-formatter="TotalFormatter">Diamond(ct)</th>
+                <th data-sortable="true" data-align="right">Diamond(g)</th>
+                <th data-sortable="true" data-align="right" data-footer-formatter="TotalFormatter">Stone(ct)</th>
+                <th data-sortable="true" data-align="right">Stone(g)</th>
+                <th data-sortable="true" data-align="center">Brand Code</th>
+                <th data-sortable="true" data-align="center">Brand Name</th>
+                <th data-sortable="true" data-align="right">Gold Price</th>
+                <th data-sortable="true" data-align="right">Silver Price</th>   <!-- 30 -->
+                <th data-sortable="true" data-align="center">MO Remark</th>
+                <th data-sortable="true" data-align="center">Planning Remark</th>
+                <th data-sortable="true" data-align="center">Std Metal Weight</th>
+                <th data-sortable="true" data-align="center">Other Nonmetal</th>
+                <th data-sortable="true" data-align="center">Discrepency</th>    <!-- 35 -->
+
+                 @* <th data-events="window.operateEvents"></th> *@
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int index = 0;
+                foreach (var item in Model.InvoiceDataList)
+                {
+                    if (item != null)
+                    {
+                        <tr id="tr_@index">
+                            @* <td data-field="state" data-checkbox="true"><input type="checkbox" /></td> *@
+                            <td data-field="row_index"></td>
+
+                            <td class="hidden">@item.Group</td>        <!-- hidden -->
+                            <td class="hidden">@item.CustomerCode</td> <!-- hidden -->
+                            <td>@item.CustomerName</td> <!-- 1 -->
+                            <td>@item.ReceivedDate</td>
+                            <td>@item.MO</td>
+                            <td>@item.Priority</td>
+                            <td>@item.OrderID</td>
+                            <td>@item.CustomerOrder</td>
+                            <td>@item.Reference</td>
+                            <td>@item.CustomerReference</td>
+                            <td>@item.ITDS</td>
+                            <td>@item.Drawing</td>      <!-- 10 -->
+                            <td>@item.LOP</td>
+                            <td>@item.Quantity</td>
+                            <td>@item.Unit</td>
+                            <td>@item.UnitPrice</td>
+                            <td>@item.Amount</td>
+                            <td>@item.ItemType</td>
+                            <td>@item.PON</td>
+                            <td>@item.InvoiceID</td>
+                            <td>@item.TaxNo</td>
+                            <td>@item.MetalWeight</td>   <!-- 20 -->
+                            <td>@item.UnitMetal</td>
+                            <td>@item.NetWeight</td>
+                            <td>@item.DiamondWeightCT</td>
+                            <td>@item.DiamondWeightG</td>
+                            <td>@item.StoneWeightCT</td>
+                            <td>@item.StoneWeightG</td>
+                            <td>@item.BrandCode</td>
+                            <td>@item.BrandName</td>
+                            <td>@item.GoldPrice</td>
+                            <td>@item.SilverPrice</td>   <!-- 30 -->
+                            <td>@item.MORemark</td>
+                            <td>@item.PlanningRemark</td>
+                            <td>@item.StdMetalWeight</td>
+                            <td>@item.OtherNonMetal</td>
+                            <td>@item.Discrepency</td>   <!-- 35 -->
+
+                        </tr>
+
+                        index++;
+                    }
+                }
+            }
+        </tbody>
+    </table>
+}

@@ -1,0 +1,93 @@
+@model dynamic
+
+@{
+    var item = Model.Line as SalesDocumentLineModel;
+    int index = Model.Index;
+
+    var UOMs = Model.UOMs as List<SelectListItem>;
+    var Currencies = Model.Currencies as List<SelectListItem>;
+    var OrderTypes = Model.OrderTypes as List<SelectListItem>;
+    var InvoiceToAddresses = Model.InvoiceToAddresses as List<SelectListItem>;
+    var ShipToAddresses = Model.ShipToAddresses as List<SelectListItem>;
+}
+
+@if (item != null)
+{
+    <tr id="tr_@index">
+        @* <td data-field="state" data-checkbox="true"><input type="checkbox" /></td> *@
+        <td data-field="row_index"></td>
+        <td data-field="sales_document_line_id">@(item.SalesDocumentLineId ?? 0)</td>
+        <td>
+            <input type="hidden" name="SalesDocumentLines[@index].SalesDocumentLineId" class="form-control" value="@(item.SalesDocumentLineId??0)" />
+            <input type="text" name="SalesDocumentLines[@index].CustomerReference" class="form-control" value="@item.CustomerReference" />
+        </td>
+        <td>
+            <input type="text" name="SalesDocumentLines[@index].ProductIDSize" class="form-control" value="@item.ProductIDSize" />
+        </td>
+        <td>
+            <input type="text" name="SalesDocumentLines[@index].LOP" class="form-control" value="@item.LOP" />
+        </td>
+        <td>
+            <input type="number" name="SalesDocumentLines[@index].Quantity" class="form-control" value="@item.Quantity" min="1" />
+        </td>
+        <td>
+            <select name="SalesDocumentLines[@index].UOM" class="form-control">
+                @foreach (var opt in UOMs)
+                {
+                    var option = $"<option value='{opt.Value}' {((opt.Value == item.UOM?.ToString()) ? "selected" : "")}>{opt.Text}</option>";
+                    @Html.Raw(option)
+                }
+            </select>
+        </td>
+        <td>
+            <input type="number" name="SalesDocumentLines[@index].UnitPrice" class="form-control" value="@item.UnitPrice" min="0.01" step="0.01"/>
+        </td>
+        <td>
+            <select name="SalesDocumentLines[@index].Currency" class="form-control">
+                @foreach (var opt in Currencies)
+                {
+                    var option = $"<option value='{opt.Value}' {((opt.Value == item.Currency?.ToString()) ? "selected" : "")}>{opt.Text}</option>";
+                    @Html.Raw(option)
+                }
+            </select>
+        </td>
+        <td>
+            <select name="SalesDocumentLines[@index].OrderType" class="form-control">
+                @foreach (var opt in OrderTypes)
+                {
+                    var option = $"<option value='{opt.Value}' {((opt.Value == item.OrderType?.ToString()) ? "selected" : "")}>{opt.Text}</option>";
+                    @Html.Raw(option)
+                }
+            </select>
+        </td>
+        <td>
+            <input type="text" name="SalesDocumentLines[@index].Stamp" class="form-control" value="@item.Stamp" />
+        </td>
+        <td>
+            <input type="text" name="SalesDocumentLines[@index].Remark" class="form-control" value="@item.Remark" />
+        </td>
+        <td>
+            <select name="SalesDocumentLines[@index].InvoiceToAddress" class="form-control invoice-to-address">
+                @foreach (var opt in InvoiceToAddresses)
+                {
+                    var option = $"<option value='{opt.Value}' {((opt.Value == item.InvoiceToAddress.ToString()) ? "selected" : "")}>{opt.Text}</option>";
+                    @Html.Raw(option)
+                }
+            </select>
+        </td>
+        <td>
+            <select name="SalesDocumentLines[@index].ShipToAddress" class="form-control ship-to-address">
+                @foreach (var opt in ShipToAddresses)
+                {
+                    var option = $"<option value='{opt.Value}' {((opt.Value == item.ShipToAddress.ToString()) ? "selected" : "")}>{opt.Text}</option>";
+                    @Html.Raw(option)
+                }
+            </select>
+        </td>
+        <td>
+            <a class="remove color-red" href="javascript:void(0)" title="Remove">
+                <i class="fa fa-trash"></i>
+            </a>
+        </td>
+    </tr>
+}
