@@ -13,7 +13,7 @@
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
-      "applicationUrl": "http://10.84.9.232:8989",
+      "applicationUrl": "http://10.84.10.204:8989",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Production"
       }
@@ -22,7 +22,7 @@
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
-      "applicationUrl": "https://10.84.9.232:8989;http://localhost:8989",
+      "applicationUrl": "https://10.84.10.204:8989;http://localhost:8989",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Production"
       }

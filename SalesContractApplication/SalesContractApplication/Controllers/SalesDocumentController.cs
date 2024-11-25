@@ -4,13 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using SalesContractApplication.API;
 using SalesContractApplication.Models;
 using OfficeOpenXml;
-using System.Security.Policy;
-using SalesContractApplication.Helper;
 using System.Reflection;
-using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
-using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
-using System;
-using Newtonsoft.Json.Linq;
 
 namespace SalesContractApplication.Controllers
 {
@@ -18,7 +12,7 @@ namespace SalesContractApplication.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly APIServices _apiServices;
-        private readonly string _apiLink;
+        private readonly string? _apiLink;
 
         public SalesDocumentController(IConfiguration configuration, APIServices apiServices)
         {
