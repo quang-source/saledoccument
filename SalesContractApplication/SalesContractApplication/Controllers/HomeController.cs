@@ -3,10 +3,6 @@ using SalesContractApplication.API;
 using SalesContractApplication.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using System.Security.Claims;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using SalesContractApplication.Helper;
 
 namespace SalesContractApplication.Controllers
 {
@@ -17,7 +13,7 @@ namespace SalesContractApplication.Controllers
         private readonly IConfiguration _configuration;
 
         private readonly ILogger<HomeController> _logger;
-        private readonly string _apiLink;
+        private readonly string? _apiLink;
 
         public HomeController(APIServices svc, IConfiguration configuration, ILogger<HomeController> logger)
         {

@@ -6,14 +6,18 @@
 
 @if (Model.InvoiceDataList != null)
 {
-
+    <div class="col-sm-4 ">
+        <div id="toolbar"></div>
+    </div>
     <table id="@str" class="table-bordered mytable"
            data-search="true"
            data-search-highlight="true"
            data-click-to-select="true"
            data-toggle="table"
-           data-show-footer="true"
+           data-show-footer="false"
            data-footer-style="footerStyle"
+           data-show-export="true"
+           data-toolbar="#toolbar"
     @* data-height="460"
        data-pagination="true"
        data-page-size="20"

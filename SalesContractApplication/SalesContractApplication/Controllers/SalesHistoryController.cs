@@ -1,14 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Extensions.Configuration;
-using Microsoft.VisualBasic;
 using Newtonsoft.Json;
 using OfficeOpenXml;
-using OfficeOpenXml.FormulaParsing.LexicalAnalysis;
 using SalesContractApplication.API;
 using SalesContractApplication.Models;
-using System.Reflection.PortableExecutable;
-using System.Security.Policy;
 
 namespace SalesContractApplication.Controllers
 {
@@ -16,7 +11,7 @@ namespace SalesContractApplication.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly APIServices _apiServices;
-        private readonly string _apiLink;
+        private readonly string? _apiLink;
 
         public SalesHistoryController(IConfiguration configuration, APIServices apiServices)
         {

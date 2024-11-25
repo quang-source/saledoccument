@@ -1,0 +1,419 @@
+﻿@model SalesContractApplication.Models.WIPReportViewModel
+
+@{
+    ViewBag.Title = "WIP Report";
+}
+
+@section Styles {
+    <style>
+       table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            /*border: 1px solid #000;
+                    padding: 8px;*/
+            text-align: center;
+        }
+                
+
+        .toggle-icon {
+            cursor: pointer;
+            display: inline-block;
+            font-weight: bold;
+            padding: 2px 6px;
+            margin-right: 5px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+    </style>
+}
+
+<!-- Main Container -->
+<div class="container-fluid">
+    <div style="height:90vh; overflow-y:auto">
+        <table id="myTable" class="table table-bordered" data-toggle="table">
+            <thead>
+                <tr>
+                    <th rowspan="2">
+                        <span>
+                            CustGroup
+                            <select class="filter form-select" data-column="0">
+                                <option value="">All</option>
+                            </select>
+                        </span>
+                    </th>
+                    <th rowspan="2">
+                        CustCode
+                        <select class="filter form-select" data-column="1">
+                            <option value="">All</option>
+                        </select>
+                    </th>
+                    <th rowspan="2">
+                        OrderType
+                        <select class="filter form-select" data-column="2">
+                            <option value="">All</option>
+                        </select>
+                    </th>
+                    <th rowspan="2">
+                        CustOrder
+                        <select class="filter form-select" data-column="3">
+                            <option value="">All</option>
+                        </select>
+                    </th>
+                    <th rowspan="2">
+                        OrderID
+                        <select class="filter form-select" data-column="4">
+                            <option value="">All</option>
+                        </select>
+                    </th>
+                    <th rowspan="2">
+                        LOP
+                        <select class="filter form-select" data-column="5">
+                            <option value="">All</option>
+                        </select>
+                    </th>
+                    <th colspan="15">ProStep</th>
+                    <th rowspan="2"> Total</th>
+                </tr>
+                <tr>
+                    <th>Packing</th>
+                    <th>Non Moving</th>
+                    <th>Repairing</th>
+                    <th>Finishing</th>
+                    <th>Pre Finishing</th>
+                    <th>Setting</th>
+                    <th>Missing Component</th>
+                    <th>Stones</th>
+                    <th>Post Preparation</th>
+                    <th>Preparation</th>
+                    <th>Casting</th>
+                    <th>Wax</th>
+                    <th>Wax Setting</th>
+                    <th>Planning</th>
+                    <th>Others</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.WIPReportList)
+                {
+                    if (item != null)
+                    {
+                        <tr>
+                            <td>@item.CustomerGroup</td>
+                            <td>@item.CustomerCode</td>
+                            <td>@item.OrderType</td>
+                            <td>@item.CustomerOrderNumber</td>
+                            <td>@item.OrderId</td>
+                            <td>@item.LOP</td>
+
+                            <td>@item.Packing</td>
+                            <td>@item.NonMoving</td>
+                            <td>@item.Repairing</td>
+                            <td>@item.Finishing</td>
+                            <td>@item.PreFinishing</td>
+                            <td>@item.Setting</td>
+                            <td>@item.MissingComponent</td>
+                            <td>@item.Stones</td>
+                            <td>@item.PostPreparation</td>
+                            <td>@item.Preparation</td>
+                            <td>@item.Casting</td>
+                            <td>@item.Wax</td>
+                            <td>@item.WaxSetting</td>
+                            <td>@item.Planning</td>
+                            <td>@item.Others</td>
+
+                            <td>@item.Total</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script type="text/javascript">
+        function populateFilters() {
+            $("#myTable thead th").each(function (index) {
+                let select = $(this).find("select.filter");
+                let uniqueValues = new Set();
+
+                $("#myTable tbody tr").each(function () {
+                    let cellValue = $(this).find("td").eq(index).text();
+                    if (cellValue) uniqueValues.add(cellValue);
+                });
+
+                uniqueValues.forEach(function (value) {
+                    select.append('<option value="' + value + '">' + value + '</option>');
+                });
+            });
+        }
+
+        $(document).ready(function () {
+            $(".filter").select2({
+                theme: "bootstrap-5",
+            });
+
+            function mergeTableCells(selector, lastColumnIndex) {
+                let rows = $(selector).find("tr");
+
+                for (let columnIndex = 0; columnIndex <= lastColumnIndex; columnIndex++) {
+                    let firstCell = null;
+                    let rowspan = 1;
+
+                    rows.each(function (i, row) {
+                        let currentCell = $(row).find("td").eq(columnIndex);
+                        currentCell.data("col", columnIndex);
+
+                        let nameAttr = 'col';
+                        for (let i = 0; i <= columnIndex; i++) {
+                            let text = $(row).find("td").eq(i).clone().find('span').remove().end().text().trim();
+                            nameAttr += `_${text}`;
+                        }
+                        currentCell.attr("name", nameAttr);
+
+                        // added this part for hierachy
+                        let isSameGroup = true;
+                        for (let prevColumnIndex = 0; prevColumnIndex < columnIndex; prevColumnIndex++) {
+                            let prevCell = $(row).find("td").eq(prevColumnIndex);
+                            let prevFirstCell = $(firstCell).closest("tr").find("td").eq(prevColumnIndex);
+                            if (prevCell.attr("name") !== prevFirstCell.attr("name")) {
+                                isSameGroup = false;
+                                break;
+                            }
+                        }
+
+                        if (firstCell && currentCell.text().trim() === firstCell.text().trim() && isSameGroup) {
+                            // Increase rowspan for previous cell
+                            rowspan++;
+                            firstCell.attr("rowspan", rowspan);
+
+                            // Hide the current cell
+                            currentCell.hide();
+                        } else {
+                            // If the previous cell had a rowspan greater than 1, add the toggle icon
+                            if (firstCell && rowspan > 1) {
+                                firstCell.html('<span class="toggle-icon">-</span>' + firstCell.html());
+                            }
+
+                            // Reset rowspan and update firstCell to the current cell
+                            rowspan = 1;
+                            firstCell = currentCell;
+                        }
+
+                        firstCell.attr("data-origin-rowspan", rowspan);
+                    });
+
+                    // After the loop, check the last cell in case it also had rowspan > 1
+                    if (firstCell && rowspan > 1) {
+                        firstCell.html('<span class="toggle-icon">-</span>' + firstCell.html());
+                    }
+                }
+            }
+            populateFilters();
+            mergeTableCells("#myTable tbody", 4); // (OrderID)
+
+            $("#myTable").on("change", "select.filter", function () {
+                $("#myTable tbody tr").each(function () {
+                    for (let i = 0; i <= 4; i++) {
+                        let td = $(this).find("td").eq(i);
+
+                        if (td.data("ignored")) {
+                            td.removeData("ignored");
+                        }
+
+                        if (td.attr("rowspan") > 1) {
+                            if (td.attr("data-origin-rowspan")) {
+                                td.attr("rowspan", td.attr("data-origin-rowspan"));
+                            } else {
+                                td.removeAttr("rowspan");
+                                td.hide();
+                            }
+                        }
+                    }
+                });
+
+                $("#myTable tbody tr").show();
+
+                let columnIndex = $(this).data("column");
+                let selectedValue = $(this).val();
+                if (selectedValue) {
+                    $("#myTable tbody tr").each(function () {
+                        let cellValue = $(this).find("td").eq(columnIndex).clone().find('span').remove().end().text();
+
+                        if (cellValue !== selectedValue) {
+                            $(this).hide();
+                        } else {
+                            let isRowSpan = $(this).find("td").eq(columnIndex).attr("rowspan") || 1;
+                            console.log("row: " + $(this).index());
+
+                            for (let i = 0; i <= 4; i++) {
+                                if (i !== columnIndex) {
+                                    let td = $(this).find("td").eq(i);
+                                    let tdVisible = $(`[name="${td.attr("name")}"]`).filter(function () {
+                                        return $(this).css('display') !== 'none';
+                                    }).first();
+                                    let rowspan = tdVisible.attr("rowspan");
+
+                                    if ((rowspan > isRowSpan) && !td.data("ignored")) {
+                                        td.attr("rowspan", isRowSpan);
+                                        td.show();
+
+                                        $(`[name="${td.attr("name")}"]:hidden`).not(td).each(function () {
+                                            $(this).data("ignored", true);
+                                        });
+
+                                    }
+                                }
+
+                            }
+                        }
+                    });
+                }
+            });
+
+            $("#myTable").on("click", ".toggle-icon", function () {
+                let icon = $(this);
+                let cell = icon.closest("td");
+                let currentRow = cell.closest("tr");
+                const cellName = cell.attr("name");
+                const cellColIdx = cell.data("col");
+
+                // Toggle between showing/hiding the rows and change icon
+                if (icon.text() === "-") {
+                    icon.text("+");
+                    let rowspan = parseInt(cell.attr("rowspan"));
+
+                    // Hide the rows under the current merged cell
+                    let nextAll = currentRow.nextAll(":visible");
+                    for (let i = 1; i < rowspan; i++) {
+                        nextAll.eq(i - 1).hide();
+                    }
+                    cell.attr("rowspan", 1);
+                    let hiddenRowCount = rowspan - 1;
+
+                    // applied logic for all col after (0: CustGroup): reducing prev columns' rowspan
+                    if (cellColIdx > 0) {
+                        for (let i = cellColIdx; i > 0; i--) {
+                            let prevCol = currentRow.find("td").eq(i - 1);
+
+                            let td = $(`[name="${prevCol.attr("name")}"]:visible`).first();
+
+                            let currentRowspan = parseInt(td.attr("rowspan"));
+                            td.attr("rowspan", currentRowspan - hiddenRowCount);
+                        }
+                    }
+
+                    // applied logic for all col before (4: OrderID): hide related cells after current cell (only td under 0, 1, 2, 3, 4 column)
+                    if (cellColIdx < 4) {
+                        let colspan = 1;
+                        const children = $(`[name*="${cellName}"]:not([name="${cellName}"])`);
+
+                        children.each(function (i, child) {
+                            $(child).hide();
+                        });
+
+                        cell.attr("colspan", 4 - cellColIdx + 1);
+                    }
+
+                    // sum all qty columns, 6 and 50 are hardcode
+                    for (let i = 6; i <= 50; i++) {
+                        let qty = parseInt(currentRow.find("td").eq(i).text()) || 0;
+
+                        let nextAll = currentRow.nextAll();
+                        for (let j = 1; j < rowspan; j++) {
+                            let nextQty = parseInt(nextAll.eq(j - 1).find("td").eq(i).text()) || 0;
+                            qty += nextQty;
+                        }
+
+                        if (qty > 0) {
+                            currentRow.find("td").eq(i).text(qty);
+                        }
+                        else {
+                            currentRow.find("td").eq(i).text('');
+                        }
+                    }
+
+                } else {
+                    icon.text("-");
+                    let rowspan = parseInt(cell.attr("data-origin-rowspan"));
+                    let hiddenRowCount = rowspan - 1;
+
+                    // applied logic for all col before (4: OrderID): show related cells after current cell (only td under 0, 1, 2, 3, 4 column)
+                    if (cellColIdx <= 4) {
+                        const children = $(`td[name*="${cellName}"]:not([name="${cellName}"])[data-origin-rowspan]`);
+
+                        let ignoredNames = []
+
+                        children.each(function (i, child) {
+                            let childIconText = $(child).find('span.toggle-icon').text();
+                            if (childIconText === '+') {
+                                ignoredNames.push($(child).attr("name"));
+
+                                hiddenRowCount -= (parseInt($(child).attr("data-origin-rowspan")) - 1);
+                            }
+                        });
+
+                        children.each(function (i, child) {
+                            let childName = $(child).attr("name");
+
+                            // Check if the childName does not contain any name in ignoredNames
+                            let isIgnored = ignoredNames.some(ignoredName => childName.includes(ignoredName) && childName != ignoredName);
+
+                            if (!isIgnored) {
+                                $(child).show(); // Show the child if it's not ignored
+                            }
+                        });
+
+                        cell.attr("rowspan", hiddenRowCount + 1);
+                        cell.attr("colspan", 1);
+                    }
+
+                    // Show the rows under the current merged cell
+                    let nextAll = currentRow.nextAll(":hidden");
+                    for (let i = 1; i < hiddenRowCount + 1; i++) {
+                        nextAll.eq(i - 1).show();
+                    }
+
+                    // applied logic for all col after (0: CustGroup): increasing prev columns' rowspan
+                    if (cellColIdx > 0) {
+                        for (let i = cellColIdx; i > 0; i--) {
+                            let prevCol = currentRow.find("td").eq(i - 1);
+
+                            let td = $(`[name="${prevCol.attr("name")}"]:visible`).first();
+
+                            let currentRowspan = parseInt(td.attr("rowspan"));
+                            td.attr("rowspan", currentRowspan + hiddenRowCount);
+                        }
+                    }
+
+                    // de-sum all qty columns  (6 -> 19)
+                    for (let i = 6; i <= 18; i++) {
+                        let qty = parseInt(currentRow.find("td").eq(i).text()) || 0;
+
+                        let nextAll = currentRow.nextAll(":visible");
+                        for (let j = 1; j < rowspan; j++) {
+                            let prevQty = parseInt(nextAll.eq(j - 1).find("td").eq(i).text()) || 0;
+                            qty -= prevQty;
+                        }
+
+                        if (qty > 0) {
+                            currentRow.find("td").eq(i).text(qty);
+                        }
+                        else {
+                            currentRow.find("td").eq(i).text('');
+                        }
+                    }
+                }
+
+            });
+
+        });
+    </script>
+}

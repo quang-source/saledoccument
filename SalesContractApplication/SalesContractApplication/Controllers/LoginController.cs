@@ -2,9 +2,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using SalesContractApplication.API;
 using SalesContractApplication.Models;
 using Newtonsoft.Json;
@@ -14,13 +12,8 @@ namespace SalesContractApplication.Controllers
     public class LoginController : Controller
     {
         private readonly APIServices _apiServices;
-        private readonly string _apiLink;
+        private readonly string? _apiLink;
 
-        // public LoginController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
-        // {
-        //     _apiServices = new APIServices(httpClientFactory.CreateClient());
-        //     _apiLink = configuration.GetValue<string>("AppSettings:API_Link");
-        // }
         public LoginController(IConfiguration configuration, APIServices apiServices)
         {
             _apiServices = apiServices; // Use dependency injection for APIServices
