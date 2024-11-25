@@ -9,15 +9,63 @@
        table {
             width: 100%;
             border-collapse: collapse;
+           
         }
         
         th, td {
-            /*border: 1px solid #000;
-                    padding: 8px;*/
+         /*    border: 1px solid red!important; */
+                    /* padding: 8px; */
             text-align: center;
+            font-size: 12px;
+            vertical-align: middle;
         }
-                
 
+
+
+        thead  {
+            position: sticky; /* Makes the header sticky */
+            top: -8px; /* Sticks to the top of the container */
+            z-index: 997; /* Ensures it stays above other rows */
+            background-color: cadetblue !important;
+        }
+
+
+        tbody td:nth-child(1), tbody td:nth-child(2), tbody td:nth-child(3), tbody td:nth-child(4), tbody td:nth-child(5), tbody td:nth-child(6) {
+            position: sticky;
+            background-color:white;
+            z-index: 996;
+        }
+
+        thead tr:nth-child(1) th:nth-child(1), thead tr:nth-child(1) th:nth-child(2), thead tr:nth-child(1) th:nth-child(3),
+        thead tr:nth-child(1) th:nth-child(4), thead tr:nth-child(1) th:nth-child(5), thead tr:nth-child(1) th:nth-child(6) {
+            position: sticky;
+            z-index: 998;
+            background-color: cadetblue !important;
+        }
+
+        tbody td:nth-child(1), thead tr:nth-child(1) th:nth-child(1) {
+            left: 0px;
+        }
+
+        tbody td:nth-child(2), thead tr:nth-child(1) th:nth-child(2) {
+            left: 67px;
+        }
+
+        tbody td:nth-child(3), thead tr:nth-child(1) th:nth-child(3) {
+            left: 223px;
+        }
+
+        tbody td:nth-child(4), thead tr:nth-child(1) th:nth-child(4) {
+            left: 290px;
+        }
+
+        tbody td:nth-child(5), thead tr:nth-child(1) th:nth-child(5) {
+            left: 459px;
+        }
+
+        tbody td:nth-child(6), thead tr:nth-child(1) th:nth-child(6) {
+            left: 536px;
+        } 
         .toggle-icon {
             cursor: pointer;
             display: inline-block;
@@ -30,43 +78,45 @@
             font-size: 12px;
         }
 
+        .highlight {
+            background-color: yellow;
+        }
     </style>
 }
-
-<!-- Main Container -->
 <div class="container-fluid">
     <div style="height:90vh; overflow-y:auto">
-        <table id="myTable" class="table table-bordered" data-toggle="table">
+        <input type="text" id="searchBox" placeholder="Type to search..." />
+        <table id="myTable" class="table table-bordered" >
             <thead>
                 <tr>
-                    <th rowspan="2">
+                    <th rowspan="2" class="frezze-column">
                         <span>
-                            CustGroup
+                            Cust Group
                             <select class="filter form-select" data-column="0">
                                 <option value="">All</option>
                             </select>
                         </span>
                     </th>
-                    <th rowspan="2">
-                        CustCode
+                    <th rowspan="2" class="frezze-column">
+                        Cust Code
                         <select class="filter form-select" data-column="1">
                             <option value="">All</option>
                         </select>
                     </th>
                     <th rowspan="2">
-                        OrderType
+                        Order Type
                         <select class="filter form-select" data-column="2">
                             <option value="">All</option>
                         </select>
                     </th>
                     <th rowspan="2">
-                        CustOrder
+                        Cust Order
                         <select class="filter form-select" data-column="3">
                             <option value="">All</option>
                         </select>
                     </th>
                     <th rowspan="2">
-                        OrderID
+                        Order ID
                         <select class="filter form-select" data-column="4">
                             <option value="">All</option>
                         </select>
@@ -77,23 +127,23 @@
                             <option value="">All</option>
                         </select>
                     </th>
-                    <th colspan="15">ProStep</th>
+                    <th colspan="15">Production Steps</th>
                     <th rowspan="2"> Total</th>
                 </tr>
                 <tr>
-                    <th>Packing</th>
-                    <th>Non Moving</th>
+                    <th >Packing</th>
+                    <th>Non <br>Moving</th>
                     <th>Repairing</th>
                     <th>Finishing</th>
-                    <th>Pre Finishing</th>
+                    <th>Pre <br>Finishing</th>
                     <th>Setting</th>
-                    <th>Missing Component</th>
+                    <th>Missing<br> Component</th>
                     <th>Stones</th>
-                    <th>Post Preparation</th>
+                    <th>Post<br> Preparation</th>
                     <th>Preparation</th>
                     <th>Casting</th>
                     <th>Wax</th>
-                    <th>Wax Setting</th>
+                    <th>Wax<br> Setting</th>
                     <th>Planning</th>
                     <th>Others</th>
                 </tr>
@@ -111,21 +161,21 @@
                             <td>@item.OrderId</td>
                             <td>@item.LOP</td>
 
-                            <td>@item.Packing</td>
-                            <td>@item.NonMoving</td>
-                            <td>@item.Repairing</td>
-                            <td>@item.Finishing</td>
-                            <td>@item.PreFinishing</td>
-                            <td>@item.Setting</td>
-                            <td>@item.MissingComponent</td>
-                            <td>@item.Stones</td>
-                            <td>@item.PostPreparation</td>
-                            <td>@item.Preparation</td>
-                            <td>@item.Casting</td>
-                            <td>@item.Wax</td>
-                            <td>@item.WaxSetting</td>
-                            <td>@item.Planning</td>
-                            <td>@item.Others</td>
+                            <td><a href="javascript:void(0)">@item.Packing</a></td>
+                            <td><a href="javascript:void(0)">@item.NonMoving</a></td>
+                            <td><a href="javascript:void(0)">@item.Repairing</a></td>
+                            <td><a href="javascript:void(0)">@item.Finishing</a></td>
+                            <td><a href="javascript:void(0)">@item.PreFinishing</a></td>
+                            <td><a href="javascript:void(0)">@item.Setting</a></td>
+                            <td><a href="javascript:void(0)">@item.MissingComponent</a></td>
+                            <td><a href="javascript:void(0)">@item.Stones</a></td>
+                            <td><a href="javascript:void(0)">@item.PostPreparation</a></td>
+                            <td><a href="javascript:void(0)">@item.Preparation</a></td>
+                            <td><a href="javascript:void(0)">@item.Casting</a></td>
+                            <td><a href="javascript:void(0)">@item.Wax</a></td>
+                            <td><a href="javascript:void(0)">@item.WaxSetting</a></td>
+                            <td><a href="javascript:void(0)">@item.Planning</a></td>
+                            <td><a href="javascript:void(0)">@item.Others</a></td>
 
                             <td>@item.Total</td>
                         </tr>
@@ -156,6 +206,42 @@
         }
 
         $(document).ready(function () {
+
+
+            function highlightSearch(term) {
+                // Clear previous highlights
+                $('#myTable td').each(function () {
+                    $(this).removeClass('highlight').html($(this).text());
+                });
+
+                if (!term.trim()) return;
+
+                // Highlight matches
+                $('#myTable td').each(function () {
+                    const content = $(this).text();
+                    const regex = new RegExp(`(${term})`, 'gi');
+                    if (regex.test(content)) {
+                        const highlighted = content.replace(regex, '<span class="highlight">$1</span>');
+                        $(this).html(highlighted);
+                    }
+                });
+            }
+
+            // Trigger search on button click
+            $('#searchButton').click(function () {
+                const searchTerm = $('#searchBox').val();
+                highlightSearch(searchTerm);
+            });
+
+            // Trigger search on Enter key press
+            $('#searchBox').keypress(function (e) {
+              // if (e.which === 13) { // Enter key code
+                    e.preventDefault();
+                    const searchTerm = $('#searchBox').val();
+                    highlightSearch(searchTerm);
+                // }
+            });
+
             $(".filter").select2({
                 theme: "bootstrap-5",
             });
