@@ -42,7 +42,7 @@
             z-index: 998;
             background-color: cadetblue !important;
         }
-
+/*
         tbody td:nth-child(1), thead tr:nth-child(1) th:nth-child(1) {
             left: 0px;
         }
@@ -66,6 +66,8 @@
         tbody td:nth-child(6), thead tr:nth-child(1) th:nth-child(6) {
             left: 536px;
         } 
+*/
+
         .toggle-icon {
             cursor: pointer;
             display: inline-block;
@@ -81,6 +83,7 @@
         .highlight {
             background-color: yellow;
         }
+
     </style>
 }
 <div class="container-fluid">
@@ -306,58 +309,70 @@
             mergeTableCells("#myTable tbody", 4); // (OrderID)
 
             $("#myTable").on("change", "select.filter", function () {
-                $("#myTable tbody tr").each(function () {
+                const selectedFilter = $(this);
+                const filterIndex = selectedFilter.closest("th").index();
+
+                // reset table
+                $("#myTable tbody tr").each(function (index, row) {
                     for (let i = 0; i <= 4; i++) {
-                        let td = $(this).find("td").eq(i);
+                        let td = $(row).find("td").eq(i);
 
                         if (td.data("ignored")) {
                             td.removeData("ignored");
                         }
 
-                        if (td.attr("rowspan") > 1) {
-                            if (td.attr("data-origin-rowspan")) {
+                        if (td.attr("data-origin-rowspan")) {
+                            if (td.attr("rowspan") > 1) {
                                 td.attr("rowspan", td.attr("data-origin-rowspan"));
                             } else {
                                 td.removeAttr("rowspan");
-                                td.hide();
                             }
+                        } else {
+                            td.removeAttr("rowspan");
+                            td.hide();
                         }
-                    }
-                });
 
-                $("#myTable tbody tr").show();
+                        td.find('span').show();
+                    }
+                    $(row).show();
+                });
 
                 let columnIndex = $(this).data("column");
                 let selectedValue = $(this).val();
+                
                 if (selectedValue) {
-                    $("#myTable tbody tr").each(function () {
-                        let cellValue = $(this).find("td").eq(columnIndex).clone().find('span').remove().end().text();
+                    $("#myTable tbody tr").each(function (index, row) {
+                        let cell = $(row).find("td").eq(columnIndex);
+                        let cellValue = cell.clone().find('span').remove().end().text();
 
                         if (cellValue !== selectedValue) {
-                            $(this).hide();
+                            $(row).hide();
                         } else {
-                            let isRowSpan = $(this).find("td").eq(columnIndex).attr("rowspan") || 1;
-                            console.log("row: " + $(this).index());
+                            let cellRowSpan = cell.attr("rowspan") || 1;
 
                             for (let i = 0; i <= 4; i++) {
-                                if (i !== columnIndex) {
-                                    let td = $(this).find("td").eq(i);
-                                    let tdVisible = $(`[name="${td.attr("name")}"]`).filter(function () {
-                                        return $(this).css('display') !== 'none';
-                                    }).first();
-                                    let rowspan = tdVisible.attr("rowspan");
+                                if (i < columnIndex) { 
+                                    let leftCell = $(row).find("td").eq(i);
+                                    if (cell.is(':visible')) {
+                                        let leftCellArr = $(`td[name="${leftCell.attr("name")}"]`);
 
-                                    if ((rowspan > isRowSpan) && !td.data("ignored")) {
-                                        td.attr("rowspan", isRowSpan);
-                                        td.show();
+                                        if (leftCellArr.length >= cellRowSpan) {
+                                            leftCell.show();
+                                            leftCell.attr("rowspan", cellRowSpan);
 
-                                        $(`[name="${td.attr("name")}"]:hidden`).not(td).each(function () {
-                                            $(this).data("ignored", true);
-                                        });
-
+                                            // leftCellArr.not(leftCell).each(function (index, td) {
+                                            //     $(td).data("ignored", true);
+                                            // });
+                                        } else {
+                                            alert('how could this happen?');
+                                        }
                                     }
+                                    leftCell.find('span').hide();
                                 }
 
+                                if (i > columnIndex) { 
+
+                                }
                             }
                         }
                     });
