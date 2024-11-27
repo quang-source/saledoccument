@@ -11,7 +11,8 @@ namespace SalesContractApplication.Models
         public List<SelectListItem> BrandCodes { get; set; }
         public List<SelectListItem> BrandNames { get; set; }
 
-        public SalesHistoryViewModel() { 
+        public SalesHistoryViewModel()
+        {
             InvoiceDataList = [];
             OldSalesList = [];
             Customers = [];

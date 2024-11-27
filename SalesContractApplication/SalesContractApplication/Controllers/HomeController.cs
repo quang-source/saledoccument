@@ -1,8 +1,8 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using SalesContractApplication.API;
 using SalesContractApplication.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 
 namespace SalesContractApplication.Controllers
 {
@@ -23,7 +23,7 @@ namespace SalesContractApplication.Controllers
             _apiLink = configuration.GetValue<string>("AppSettings:API_Link");
         }
 
-     
+
         public IActionResult Index()
         {
             var token = HttpContext.Session.GetString("Token");
@@ -58,7 +58,7 @@ namespace SalesContractApplication.Controllers
             var model = new SalesDocumentViewModel();
             var list = JsonConvert.DeserializeObject<List<SalesDocumentLineModel>>(response.Data);
 
-            model.SalesDocumentLines = list==null ? new List<SalesDocumentLineModel>() : list;
+            model.SalesDocumentLines = list == null ? new List<SalesDocumentLineModel>() : list;
             return list != null ? PartialView("_partial/sale_document_detail_table", model) : Content("<html><body>No matching records found</body></html>", "text/html");
         }
 
@@ -92,9 +92,10 @@ namespace SalesContractApplication.Controllers
                 return Json(null);
             }
             string url = $"{_apiLink}/cancel-sales-document";
-           
-            var parameter = new {
-                document_id= id
+
+            var parameter = new
+            {
+                document_id = id
             };
             string jsonData = JsonConvert.SerializeObject(parameter);
             var response = await _svc.SendPostRequest(url, jsonData, token);

@@ -121,7 +121,7 @@ namespace SalesContractApplication.Models
         [JsonProperty("silver_price")]
         public float SilverPrice { get; set; }
 
-        [JsonProperty("_other_nonmetal")]   
+        [JsonProperty("_other_nonmetal")]
         public float OtherNonMetal { get; set; }
 
         [JsonProperty("std_metal_weight")]

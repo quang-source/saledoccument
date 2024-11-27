@@ -61,10 +61,14 @@
 
             @RenderBody()
 
-            <div id="splash_screen" class="loading hidden">Loading&#8230;</div>
+            <div id="splash_screen" class="loading ">Loading&#8230;</div>
         </main>
     </div>
-
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#splash_screen').toggleClass('hidden');
+        });    
+    </script>
     <footer class="border-top footer text-muted">
         <div class="container">
             &copy; @DateTime.Now.Year - Sales Document - <a asp-area="" asp-controller="Home" asp-action="/">D.I limited</a>

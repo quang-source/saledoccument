@@ -1,9 +1,9 @@
-﻿using Newtonsoft.Json;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json;
+using OfficeOpenXml;
 using SalesContractApplication.API;
 using SalesContractApplication.Models;
-using OfficeOpenXml;
 using System.Reflection;
 
 namespace SalesContractApplication.Controllers

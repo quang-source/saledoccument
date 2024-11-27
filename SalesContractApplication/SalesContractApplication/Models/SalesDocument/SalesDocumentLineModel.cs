@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace SalesContractApplication.Models
 {
@@ -102,7 +102,7 @@ namespace SalesContractApplication.Models
         public int? Status { get; set; }
 
         [JsonProperty("status_description")]
-        public string? StatusDescription { get; set; } 
+        public string? StatusDescription { get; set; }
 
         [JsonProperty("amount")]
         public string? Amount { get; set; }

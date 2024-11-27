@@ -1,12 +1,8 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
 using SalesContractApplication.Models;
-using System;
-using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace SalesContractApplication.API
 {
@@ -36,7 +32,7 @@ namespace SalesContractApplication.API
                     rp.Success = false;
                     string jsonResponse = response.Content.ReadAsStringAsync().Result;
                     JObject json = JObject.Parse(jsonResponse);
-                    if (json !=null && json["Error"] != null)
+                    if (json != null && json["Error"] != null)
                     {
                         rp.Error = json["Error"].ToString();
                     }

@@ -2,10 +2,10 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+using Newtonsoft.Json;
 using SalesContractApplication.API;
 using SalesContractApplication.Models;
-using Newtonsoft.Json;
+using System.Security.Claims;
 
 namespace SalesContractApplication.Controllers
 {
@@ -67,7 +67,7 @@ namespace SalesContractApplication.Controllers
 
                     return RedirectToAction("Index", "Home"); // Redirect to the home page after successful login
                 }
-                
+
                 ModelState.AddModelError("", apiResponse.Error);
             }
 

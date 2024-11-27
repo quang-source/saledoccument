@@ -9,7 +9,6 @@
        table {
             width: 100%;
             border-collapse: collapse;
-           
         }
         
         th, td {
@@ -19,29 +18,30 @@
             font-size: 12px;
             vertical-align: middle;
         }
-
-
-
         thead  {
             position: sticky; /* Makes the header sticky */
             top: -8px; /* Sticks to the top of the container */
             z-index: 997; /* Ensures it stays above other rows */
             background-color: cadetblue !important;
         }
-
-
         tbody td:nth-child(1), tbody td:nth-child(2), tbody td:nth-child(3), tbody td:nth-child(4), tbody td:nth-child(5), tbody td:nth-child(6) {
             position: sticky;
             background-color:white;
             z-index: 996;
         }
-
         thead tr:nth-child(1) th:nth-child(1), thead tr:nth-child(1) th:nth-child(2), thead tr:nth-child(1) th:nth-child(3),
         thead tr:nth-child(1) th:nth-child(4), thead tr:nth-child(1) th:nth-child(5), thead tr:nth-child(1) th:nth-child(6) {
             position: sticky;
             z-index: 998;
             background-color: cadetblue !important;
         }
+
+        .select2-container--bootstrap-5 .select2-selection--single {
+  background-size: 7px 7px;
+  padding:.375rem 3px;
+  text-align:left;
+      font-size: 12px;
+}
 /*
         tbody td:nth-child(1), thead tr:nth-child(1) th:nth-child(1) {
             left: 0px;
@@ -67,7 +67,6 @@
             left: 536px;
         } 
 */
-
         .toggle-icon {
             cursor: pointer;
             display: inline-block;
@@ -79,7 +78,6 @@
             border-radius: 4px;
             font-size: 12px;
         }
-
         .highlight {
             background-color: yellow;
         }
@@ -94,40 +92,40 @@
                 <tr>
                     <th rowspan="2" class="frezze-column">
                         <span>
-                            Cust Group
-                            <select class="filter form-select" data-column="0">
-                                <option value="">All</option>
+                             Group
+                            <select class="filter form-select" data-column="0"  data-filter="customer_group">
+                                <option value="ALL">All</option>
                             </select>
                         </span>
                     </th>
                     <th rowspan="2" class="frezze-column">
-                        Cust Code
-                        <select class="filter form-select" data-column="1">
-                            <option value="">All</option>
+                        Customer
+                        <select class="filter form-select" data-column="1"data-filter="customer_code">
+                            <option value="ALL">All</option>
                         </select>
                     </th>
                     <th rowspan="2">
                         Order Type
-                        <select class="filter form-select" data-column="2">
-                            <option value="">All</option>
+                        <select class="filter form-select" data-column="2"data-filter="order_type">
+                            <option value="ALL">All</option>
                         </select>
                     </th>
                     <th rowspan="2">
                         Cust Order
-                        <select class="filter form-select" data-column="3">
-                            <option value="">All</option>
+                        <select class="filter form-select" data-column="3"data-filter="customer_order_number">
+                            <option value="ALL">All</option>
                         </select>
                     </th>
                     <th rowspan="2">
                         Order ID
-                        <select class="filter form-select" data-column="4">
-                            <option value="">All</option>
+                        <select class="filter form-select" data-column="4"data-filter="order_id">
+                            <option value="ALL">All</option>
                         </select>
                     </th>
                     <th rowspan="2">
                         LOP
-                        <select class="filter form-select" data-column="5">
-                            <option value="">All</option>
+                        <select class="filter form-select" data-column="5"data-filter="lop">
+                            <option value="ALL">All</option>
                         </select>
                     </th>
                     <th colspan="15">Production Steps</th>
@@ -152,66 +150,104 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model.WIPReportList)
-                {
-                    if (item != null)
-                    {
-                        <tr>
-                            <td>@item.CustomerGroup</td>
-                            <td>@item.CustomerCode</td>
-                            <td>@item.OrderType</td>
-                            <td>@item.CustomerOrderNumber</td>
-                            <td>@item.OrderId</td>
-                            <td>@item.LOP</td>
-
-                            <td><a href="javascript:void(0)">@item.Packing</a></td>
-                            <td><a href="javascript:void(0)">@item.NonMoving</a></td>
-                            <td><a href="javascript:void(0)">@item.Repairing</a></td>
-                            <td><a href="javascript:void(0)">@item.Finishing</a></td>
-                            <td><a href="javascript:void(0)">@item.PreFinishing</a></td>
-                            <td><a href="javascript:void(0)">@item.Setting</a></td>
-                            <td><a href="javascript:void(0)">@item.MissingComponent</a></td>
-                            <td><a href="javascript:void(0)">@item.Stones</a></td>
-                            <td><a href="javascript:void(0)">@item.PostPreparation</a></td>
-                            <td><a href="javascript:void(0)">@item.Preparation</a></td>
-                            <td><a href="javascript:void(0)">@item.Casting</a></td>
-                            <td><a href="javascript:void(0)">@item.Wax</a></td>
-                            <td><a href="javascript:void(0)">@item.WaxSetting</a></td>
-                            <td><a href="javascript:void(0)">@item.Planning</a></td>
-                            <td><a href="javascript:void(0)">@item.Others</a></td>
-
-                            <td>@item.Total</td>
-                        </tr>
-                    }
-                }
             </tbody>
         </table>
     </div>
 </div>
-
-
 @section Scripts {
     <script type="text/javascript">
+        let arr = new Array();
+        function checkText(text){
+             return text == null ? '' : text;
+        }
+        function filterByKeyValue(array, key, value) {
+            return array.filter(item => item[key].trim() === value.trim());
+        }
+        function drawTable (arrayData)
+        {
+            
+             const $tbody = $('#myTable tbody');
+              $('#myTable tbody tr').remove()
+                        arrayData.forEach(row => {
+                        const $tr = $('<tr></tr>'); 
+                        $tr.append(`<td>${checkText(row.customer_group)}</td>`);
+                        $tr.append(`<td>${checkText(row.customer_code)}</td>`);
+                        $tr.append(`<td>${checkText(row.order_type)}</td>`);
+                        $tr.append(`<td>${checkText(row.customer_order_number)}</td>`);
+                        $tr.append(`<td>${checkText(row.order_id).trim()}</td>`);
+                        $tr.append(`<td>${checkText(row.lop)}</td>`);
+                        $tr.append(`<td><a href="javascript:void(0)">${checkText(row.packing)}</a></td>`);
+                        $tr.append(`<td><a href="javascript:void(0)">${checkText(row.non_moving)}</a></td>`);
+                        $tr.append(`<td><a href="javascript:void(0)">${checkText(row.repairing)}</a></td>`);
+                        $tr.append(`<td><a href="javascript:void(0)">${checkText(row.finishing)}</a></td>`);
+                        $tr.append(`<td><a href="javascript:void(0)">${checkText(row.pre_finishing)}</a></td>`);
+                        $tr.append(`<td><a href="javascript:void(0)">${checkText(row.setting)}</a></td>`);
+                        $tr.append(`<td><a href="javascript:void(0)">${checkText(row.missing_component)}</a></td>`);
+                        $tr.append(`<td><a href="javascript:void(0)">${checkText(row.stones)}</a></td>`);
+                        $tr.append(`<td><a href="javascript:void(0)">${checkText(row.post_preparation)}</a></td>`);
+                        $tr.append(`<td><a href="javascript:void(0)">${checkText(row.preparation)}</a></td>`);
+                        $tr.append(`<td><a href="javascript:void(0)">${checkText(row.casting)}</a></td>`);
+                        $tr.append(`<td><a href="javascript:void(0)">${checkText(row.wax)}</a></td>`);
+                        $tr.append(`<td><a href="javascript:void(0)">${checkText(row.wax_setting)}</a></td>`);
+                        $tr.append(`<td><a href="javascript:void(0)">${checkText(row.planning)}</a></td>`);
+                        $tr.append(`<td><a href="javascript:void(0)">${checkText(row.others)}</a></td>`);
+                        $tr.append(`<td>${checkText(row.total)}</td>`);
+                            $tbody.append($tr); 
+                        });
+
+            mergeTableCells("#myTable tbody", 4);
+        }
+        function getData(){
+           
+            $.ajax({
+                url: '@Url.Action("GetWipReport", "WIPReport")',
+                type: 'GET',
+                   async: false,
+                success: function (result) {
+                    if (result.success) {
+                      arr = JSON.parse(result.data);
+                      console.log(arr.length)
+                      drawTable(arr);
+                      populateFilters() ;
+                      
+                    } else {
+                     showToast('error', 'Can Not find Wip Report data : ' + data.Error );
+
+                    }  
+                  
+                },
+                error: function (xhr, status, error) {
+                    console.log("xhr : " + xhr)
+                    console.log("status : " + status)
+                    console.log("error : " + error)
+                    alert("Error: " + error);
+                }
+            }).done(function (result) {
+                 
+                // $detail_table.bootstrapTable('hideLoading')
+            });
+        }
+
         function populateFilters() {
             $("#myTable thead th").each(function (index) {
                 let select = $(this).find("select.filter");
+                $($(this).find("select.filter option")).each(function (i,k) {
+                    console.log('remove');
+                    $(k).remove();
+                });
                 let uniqueValues = new Set();
 
-                $("#myTable tbody tr").each(function () {
-                    let cellValue = $(this).find("td").eq(index).text();
-                    if (cellValue) uniqueValues.add(cellValue);
+                $("#myTable tbody tr:visible").each(function () {
+                    let cellValue = $(this).find("td").eq(index).clone().find('span').remove().end().text();
+                    uniqueValues.add(cellValue);
                 });
-
+                select.append(' <option value="">All</option>');
                 uniqueValues.forEach(function (value) {
                     select.append('<option value="' + value + '">' + value + '</option>');
                 });
             });
         }
-
-        $(document).ready(function () {
-
-
-            function highlightSearch(term) {
+  function highlightAndFocus(term) {
                 // Clear previous highlights
                 $('#myTable td').each(function () {
                     $(this).removeClass('highlight').html($(this).text());
@@ -219,36 +255,41 @@
 
                 if (!term.trim()) return;
 
-                // Highlight matches
+                let lastMatch = null;
+
+                // Highlight matches and track the last one
                 $('#myTable td').each(function () {
                     const content = $(this).text();
                     const regex = new RegExp(`(${term})`, 'gi');
                     if (regex.test(content)) {
                         const highlighted = content.replace(regex, '<span class="highlight">$1</span>');
                         $(this).html(highlighted);
+                        lastMatch = $(this);
                     }
                 });
+
+                // Focus on the last matched cell, if any
+                if (lastMatch) {
+                    const cell = lastMatch[0];
+                    const span = cell.querySelector('.highlight');
+                    if (span) {
+                        // Scroll the cell into view
+                        cell.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                        // Move cursor to the end of the last match
+                        const range = document.createRange();
+                        const selection = window.getSelection();
+                        range.selectNodeContents(span);
+                        range.collapse(false); // Move to the end
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                    }
+                }
             }
 
-            // Trigger search on button click
-            $('#searchButton').click(function () {
-                const searchTerm = $('#searchBox').val();
-                highlightSearch(searchTerm);
-            });
+         
 
-            // Trigger search on Enter key press
-            $('#searchBox').keypress(function (e) {
-              // if (e.which === 13) { // Enter key code
-                    e.preventDefault();
-                    const searchTerm = $('#searchBox').val();
-                    highlightSearch(searchTerm);
-                // }
-            });
-
-            $(".filter").select2({
-                theme: "bootstrap-5",
-            });
-
+            
             function mergeTableCells(selector, lastColumnIndex) {
                 let rows = $(selector).find("tr");
 
@@ -266,8 +307,6 @@
                             nameAttr += `_${text}`;
                         }
                         currentCell.attr("name", nameAttr);
-
-                        // added this part for hierachy
                         let isSameGroup = true;
                         for (let prevColumnIndex = 0; prevColumnIndex < columnIndex; prevColumnIndex++) {
                             let prevCell = $(row).find("td").eq(prevColumnIndex);
@@ -279,19 +318,13 @@
                         }
 
                         if (firstCell && currentCell.text().trim() === firstCell.text().trim() && isSameGroup) {
-                            // Increase rowspan for previous cell
                             rowspan++;
                             firstCell.attr("rowspan", rowspan);
-
-                            // Hide the current cell
                             currentCell.hide();
                         } else {
-                            // If the previous cell had a rowspan greater than 1, add the toggle icon
                             if (firstCell && rowspan > 1) {
                                 firstCell.html('<span class="toggle-icon">-</span>' + firstCell.html());
                             }
-
-                            // Reset rowspan and update firstCell to the current cell
                             rowspan = 1;
                             firstCell = currentCell;
                         }
@@ -305,80 +338,33 @@
                     }
                 }
             }
-            populateFilters();
-            mergeTableCells("#myTable tbody", 4); // (OrderID)
-
-            $("#myTable").on("change", "select.filter", function () {
-                const selectedFilter = $(this);
-                const filterIndex = selectedFilter.closest("th").index();
-
-                // reset table
-                $("#myTable tbody tr").each(function (index, row) {
-                    for (let i = 0; i <= 4; i++) {
-                        let td = $(row).find("td").eq(i);
-
-                        if (td.data("ignored")) {
-                            td.removeData("ignored");
-                        }
-
-                        if (td.attr("data-origin-rowspan")) {
-                            if (td.attr("rowspan") > 1) {
-                                td.attr("rowspan", td.attr("data-origin-rowspan"));
-                            } else {
-                                td.removeAttr("rowspan");
-                            }
-                        } else {
-                            td.removeAttr("rowspan");
-                            td.hide();
-                        }
-
-                        td.find('span').show();
-                    }
-                    $(row).show();
-                });
-
-                let columnIndex = $(this).data("column");
-                let selectedValue = $(this).val();
-                
-                if (selectedValue) {
-                    $("#myTable tbody tr").each(function (index, row) {
-                        let cell = $(row).find("td").eq(columnIndex);
-                        let cellValue = cell.clone().find('span').remove().end().text();
-
-                        if (cellValue !== selectedValue) {
-                            $(row).hide();
-                        } else {
-                            let cellRowSpan = cell.attr("rowspan") || 1;
-
-                            for (let i = 0; i <= 4; i++) {
-                                if (i < columnIndex) { 
-                                    let leftCell = $(row).find("td").eq(i);
-                                    if (cell.is(':visible')) {
-                                        let leftCellArr = $(`td[name="${leftCell.attr("name")}"]`);
-
-                                        if (leftCellArr.length >= cellRowSpan) {
-                                            leftCell.show();
-                                            leftCell.attr("rowspan", cellRowSpan);
-
-                                            // leftCellArr.not(leftCell).each(function (index, td) {
-                                            //     $(td).data("ignored", true);
-                                            // });
-                                        } else {
-                                            alert('how could this happen?');
-                                        }
-                                    }
-                                    leftCell.find('span').hide();
-                                }
-
-                                if (i > columnIndex) { 
-
-                                }
-                            }
-                        }
-                    });
-                }
+        $(document).ready(function () {
+            getData();  
+            $(".filter").select2({
+                    theme: "bootstrap-5",
             });
-
+            $('#searchBox').keypress(function (e) {
+                    e.preventDefault();
+                    const searchTerm = $('#searchBox').val();
+                    highlightAndFocus(searchTerm);
+            });
+            $("#myTable").on("change", "select.filter", function () {
+               let columnIndex = $(this).data("column");
+               let selectedValue = $(this).val(); 
+               let filteredArray = arr;
+                $("#myTable thead th select.filter").each(function (v, k) 
+                {
+                      var columnToFilter =  $(k).data("filter");
+                      var valueToFilter = $(k).val();
+                      if(valueToFilter != 'ALL' && valueToFilter != ''){
+                            filteredArray =    filterByKeyValue(filteredArray, columnToFilter, valueToFilter);
+                      }
+                });
+                drawTable(filteredArray);
+                const oldval = $(this).val();
+                populateFilters();
+                $(this).val(oldval);
+            });
             $("#myTable").on("click", ".toggle-icon", function () {
                 let icon = $(this);
                 let cell = icon.closest("td");
@@ -434,7 +420,7 @@
                         }
 
                         if (qty > 0) {
-                            currentRow.find("td").eq(i).text(qty);
+                            currentRow.find("td").eq(i).html('<a href="javascript:void(0)">'+qty+'</a>');
                         }
                         else {
                             currentRow.find("td").eq(i).text('');
@@ -505,7 +491,7 @@
                         }
 
                         if (qty > 0) {
-                            currentRow.find("td").eq(i).text(qty);
+                            currentRow.find("td").eq(i).html('<a href="javascript:void(0)">'+qty+'</a>');
                         }
                         else {
                             currentRow.find("td").eq(i).text('');
