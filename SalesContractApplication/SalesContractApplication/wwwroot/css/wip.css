@@ -1,0 +1,94 @@
+﻿body {
+    overflow-y: hidden;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    /*    border: 1px solid red!important; */
+    /* padding: 8px; */
+    text-align: center;
+    font-size: 12px;
+    vertical-align: middle;
+    border: 1px solid black;
+    padding: 8px;
+    white-space: nowrap; /* Prevent text wrapping */
+}
+thead {
+    position: sticky; /* Makes the header sticky */
+    top: 0px; /* Sticks to the top of the container */
+    z-index: 997; /* Ensures it stays above other rows */
+    background-color: cadetblue !important;
+    cursor: pointer
+}
+
+.select2-container--bootstrap-5 .select2-selection--single {
+    background-size: 7px 7px;
+    padding: .375rem 3px;
+    text-align: left;
+    font-size: 12px;
+}
+
+.toggle-icon {
+    cursor: pointer;
+    display: inline-block;
+    font-weight: bold;
+    padding: 2px 6px;
+    margin-right: 5px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.highlight {
+    background-color: yellow; /* Highlight background */
+    font-weight: bold; /* Bold the matched text */
+}
+
+/* General Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 10px; /* Vertical scrollbar width */
+    height: 10px; /* Horizontal scrollbar height */
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Track color */
+    border-radius: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #888; /* Handle color */
+    border-radius: 10px;
+}
+
+    /* Handle Hover */
+    ::-webkit-scrollbar-thumb:hover {
+        background: #555; /* Handle hover color */
+    }
+
+/* Styling specific to the table's scroll container */
+.scrollable-table::-webkit-scrollbar {
+    width: 12px; /* Slightly wider scrollbar for table */
+    height: 12px;
+}
+
+.scrollable-table::-webkit-scrollbar-thumb {
+    background: #444; /* Darker handle color */
+    border-radius: 8px;
+}
+
+.scrollable-table::-webkit-scrollbar-track {
+    background: #e0e0e0; /* Lighter track color */
+}
+.sort-indicator {
+    margin-left: 5px; /* Add some space between the text and the icon */
+    font-size:2em;
+    color: white;
+}
+

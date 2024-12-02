@@ -59,9 +59,9 @@
         <main role="main" class="pb-3">
             @await Html.PartialAsync("_PopupModal")
 
-            @RenderBody()
-
             <div id="splash_screen" class="loading ">Loading&#8230;</div>
+
+            @RenderBody()
         </main>
     </div>
     <script type="text/javascript">

@@ -262,7 +262,7 @@ th[data-field="sales_document_line_id"], td[data-field="sales_document_line_id"]
 
 .loading {
     position: fixed;
-    z-index: 999;
+    z-index: 99999;
     height: 2em;
     width: 2em;
     overflow: show;

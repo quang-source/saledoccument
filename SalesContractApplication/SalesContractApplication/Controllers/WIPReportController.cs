@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using SalesContractApplication.API;
 
 namespace SalesContractApplication.Controllers
@@ -21,38 +22,49 @@ namespace SalesContractApplication.Controllers
         [HttpGet]
         public async Task<JsonResult> GetWipReport()
         {
-            var token = HttpContext.Session.GetString("Token");
+            string? token = HttpContext.Session.GetString("Token");
 
             if (token == null)
             {
                 return Json(null);
             }
-            var url = $"{_apiLink}/get-wip-report";
-            var apiResponse = await _apiServices.SendGetRequest(url, "", token);
+            string url = $"{_apiLink}/get-wip-report";
+            Models.ApiResponseModel apiResponse = await _apiServices.SendGetRequest(url, "", token);
             return Json(apiResponse);
         }
+        [HttpPost]
+        public async Task<JsonResult> GetWipReport_detail(string group, string customer, string orderType, string custOrder, string orderID, string LOP, string currentStep)
+        {
+            string? token = HttpContext.Session.GetString("Token");
+            if (token == null)
+            {
+                return Json(null);
+            }
+            string url = $"{_apiLink}/get-wip-detail";
+
+            var parameter = new
+            {
+                customer_group = group,
+                customer_code = customer,
+                order_type = orderType,
+                customer_order_number = custOrder,
+                order_id = orderID,
+                lop = LOP,
+                pro_step = currentStep
+            };
+            string jsonData = JsonConvert.SerializeObject(parameter);
+            Models.ApiResponseModel response = await _apiServices.SendPostRequest(url, jsonData, token);
+            return Json(response);
+        }
+
 
         public async Task<IActionResult> Index()
         {
-            // var model = new WIPReportViewModel();
-            var token = HttpContext.Session.GetString("Token");
+            string? token = HttpContext.Session.GetString("Token");
             if (token == null)
             {
                 return RedirectToAction("Index", "Login");
             }
-
-            //// Get data
-            //var url = $"{_apiLink}/get-wip-report";
-            //var apiResponse = await _apiServices.SendGetRequest(url, "", token);
-            //if (apiResponse.Success)
-            //{
-            //    var data = JsonConvert.DeserializeObject<List<WIPReportModel>>(apiResponse.Data.ToString());
-            //    if (data != null)
-            //    {
-            //        model.WIPReportList = data;
-            //    }
-            //}
-            //model
             return View();
         }
     }
