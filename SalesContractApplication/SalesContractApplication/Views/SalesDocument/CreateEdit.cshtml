@@ -1,5 +1,8 @@
 ﻿@model SalesContractApplication.Models.SalesDocumentViewModel
 
+<link href="~/css/wip.css" rel="stylesheet" />
+<link href="~/css/bootstrap-icons.css" rel="stylesheet" />
+
 @{
     ViewBag.Title = $"{(ViewBag.IsEdit ? "Edit" : "Create")} Sales Document";
     var errors = ViewBag.Errors as List<Microsoft.AspNetCore.Mvc.ModelBinding.ModelError>;
@@ -195,6 +198,12 @@
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Other Info</button>
             </li>
+            @if (Model.SalesDocument.Status >= 60)
+            {
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="tracker-tab" data-bs-toggle="tab" data-bs-target="#tracker" type="button" role="tab" aria-controls="tracker" aria-selected="false">Order Tracking</button>
+                </li>
+            }
         </ul>
         <!-- Tab content -->
         <div class="tab-content border p-2" id="myTabContent">
@@ -282,6 +291,57 @@
 
             </div>
 
+            <div class="tab-pane fade" id="tracker" role="tabpanel" aria-labelledby="tracker-tab">
+                <div class="col-12 overflow-auto" style="max-height: 80vh;">
+                    <table id="myTable" class="table table-bordered scrollable-table">
+                        <thead>
+                            <tr>
+                                <th rowspan="2" class="frezze-column" data-column="0" data-filter="customer_group">
+                                    Group
+                                </th>
+                                <th rowspan="2" class="frezze-column" data-column="1" data-filter="customer_code">
+                                    Customer
+                                </th>
+                                <th rowspan="2" data-column="2" data-filter="order_type">
+                                    Order Type
+                                </th>
+                                <th rowspan="2" data-column="3" data-filter="customer_order_number">
+                                    Cust Order
+                                </th>
+                                <th rowspan="2" data-column="4" data-filter="order_id">
+                                    Order ID
+                                </th>
+                                <th rowspan="2" data-column="5" data-filter="lop">
+                                    LOP
+                                </th>
+                                <th colspan="15">Production Steps</th>
+                                <th rowspan="2" data-column="21" data-filter="total"> Total<span class="sort-indicator"></span></th>
+                            </tr>
+                            <tr>
+                                <th data-column="6" data-filter="packing">Packing</th>
+                                <th data-column="7" data-filter="non_moving">Non <br>Moving</th>
+                                <th data-column="8" data-filter="repairing">Repairing</th>
+                                <th data-column="9" data-filter="finishing">Finishing</th>
+                                <th data-column="10" data-filter="pre_finishing">Pre <br>Finishing</th>
+                                <th data-column="11" data-filter="setting">Setting</th>
+                                <th data-column="12" data-filter="missing_component">Missing<br> Component</th>
+                                <th data-column="13" data-filter="stones">Stones</th>
+                                <th data-column="14" data-filter="past_preparation">Post<br> Preparation</th>
+                                <th data-column="15" data-filter="preparation">Preparation</th>
+                                <th data-column="16" data-filter="casting">Casting</th>
+                                <th data-column="17" data-filter="wax">Wax</th>
+                                <th data-column="18" data-filter="wax_setting">Wax<br> Setting</th>
+                                <th data-column="19" data-filter="planing">Planning</th>
+                                <th data-column="20" data-filter="others">Others</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Table rows go here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
         <div class="form-group mt-4">
             <div class="col-md-offset-10 col-md-2">
@@ -291,7 +351,27 @@
     }
 
 </div>
+<div class="modal fade" id="cellDetailsModal" tabindex="-1" aria-labelledby="cellDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <!-- Enlarged modal -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cellDetailsModalLabel">Details Table</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Dynamic content will go here -->
+                <table id="popupTable" class="table table-bordered">
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
+<script src="~/js/common.js"></script>
 @section Scripts {
     <script type="text/javascript">
         function TotalFormatter(data, footerValue) {
@@ -320,7 +400,132 @@
 
             });
         }
+
+        function getData() {
+            let arr = new Array();
+            let cust_order = $('#SalesDocument_PurchaseOrderNumber').val();
+
+            $.ajax({
+                url: '@Url.Action("GetWipReportByCustOrder", "WIPReport")',
+                type: 'GET',
+                async: false,
+                data: {
+                    custOrder: cust_order
+                },
+                success: function (result) {
+                    if (result.success) {
+                        arr = JSON.parse(result.data);
+
+                        drawTable(arr);
+
+                        $("#myTable thead tr:first-child th:nth-child(-n+4)").hide();
+
+                        $("#myTable tbody tr").each(function () {
+                            $(this).find("td:nth-child(-n+4)").hide();
+                        });
+                    } else {
+                        showToast('error', 'Can Not find Wip Report data : ' + data.Error);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.log("xhr : " + xhr)
+                    console.log("status : " + status)
+                    console.log("error : " + error)
+                    alert("Error: " + error);
+                }
+            }).done(function (result) {
+            });
+        }
+        function handelDetailQtyClick() {
+            $('#myTable tbody').on('click', 'td a', function () {
+                const $cell = $(this); // The clicked cell
+                const $row = $cell.closest('tr'); // The clicked cell's row
+                const rowData = [];
+                $row.children('td, th').each(function (index) {
+                    const colSpan = $(this).attr('colspan') || 1; // Get colspan (default 1)
+                    const rowSpan = $(this).attr('rowspan') || 1; // Get rowspan (default 1)
+                    for (let i = 0; i < colSpan; i++) {
+                        rowData.push($(this).clone().find('span').remove().end().text().trim());
+                    }
+                });
+                const columnKey = $(this).data('filter');
+                let group = rowData[0];
+                let customer = rowData[1];
+                let orderType = rowData[2];
+                let custOrder = rowData[3];
+                let orderID = rowData[4];
+                let LOP = rowData[5];
+                $('#cellDetailsModal .modal-body').html('<table id="popupTable" data-pagination="true"   data-page-list="[10, 25, 50, 100, all]"  data-page-size="10"  data-search="true"  data-buttons-class="btn btn-info" data-show-export = "true" class= "table table-bordered" ></table > ');
+                var $table = $("#popupTable");
+                $.ajax({
+                    url: '@Url.Action("GetWipReport_detail", "WIPReport")',
+                    type: 'POST',
+                    data: {
+                        group: group,
+                        customer: customer,
+                        orderType: orderType,
+                        custOrder: custOrder,
+                        orderID: orderID,
+                        LOP: LOP,
+                        currentStep: columnKey
+                    },
+                    //async: false,
+                    beforeSend: function () {
+                        $('#splash_screen').removeClass('hidden'); // Show loading screen
+                    },
+                    complete: function () {
+                        $('#splash_screen').addClass('hidden');
+                    },
+                    success: function (result) {
+                        if (result.success) {
+                            var jsonArray = JSON.parse(result.data);
+                            var rearrangedHeaders = ['No.', 'CustName', 'BagNumber', 'LOP', 'Reference', 'Name', 'Gamme', 'DrawingNumber', 'Brand', 'Quantity', 'ItemType', 'Size', 'CustOrder', 'OrderID', 'OrderType', 'OrderIDLine', 'OrderDate', 'ProStep', 'StepIndex', 'Remark', 'TechnicalGroup', 'FinishWeek', 'WeekRequest', 'OrderWeek', 'LastJobDate'];  // Specify the desired order
+
+                            var $thead = $("<thead></thead>");
+                            var $theadRow = $("<tr></tr>");
+                            rearrangedHeaders.forEach(function (header) {
+                                $theadRow.append($("<th></th>").text(header));
+                            });
+                            $thead.append($theadRow);
+                            $table.append($thead);
+                            var $tbody = $("<tbody></tbody>");
+                            jsonArray.forEach(function (row) {
+                                var $row = $("<tr></tr>");
+                                rearrangedHeaders.forEach(function (header) {
+                                    $row.append($("<td></td>").text(row[header]));
+                                });
+                                $tbody.append($row);
+                            });
+                            $table.append($tbody);
+                            $table.bootstrapTable();
+                            const cellValue = $cell.clone().find('span').remove().end().text().trim();
+                            $('#cellDetailsModalLabel').html(` <strong>Customer:</strong> ${customer}<br/>
+                                    <strong>Customer Order Number:</strong> ${custOrder}<br/>
+                                    <strong>Current Step:</strong> ${columnKey} (${cellValue} pcs) `);
+                            $('#cellDetailsModal').modal('show');
+                        } else {
+                            showToast('error', 'Can Not find Wip Report data : ' + result.error);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.log("xhr : " + xhr)
+                        console.log("status : " + status)
+                        console.log("error : " + error)
+                        alert("Error: " + error);
+                    }
+                }).done(function (result) {
+                });
+            });
+        }
         $(document).ready(function () {
+
+            $('#myTab').on('shown.bs.tab', function (event) {
+                if ($(event.target).attr('id') === 'tracker-tab') {
+                    getData();
+                }
+            });
+
+            handelDetailQtyClick();
             $("#myForm").submit(function (e) {
                 var checkResult = true;
                 if ($('#lines-table tbody tr').not('.no-records-found').length == 0) {

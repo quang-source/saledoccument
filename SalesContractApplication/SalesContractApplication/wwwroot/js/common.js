@@ -82,15 +82,14 @@ function filterByKeyValue(array, key, value) {
 function drawTable(arrayData, searchValue = '') {
     const $tbody = $('#myTable tbody');
     $('#myTable tbody tr').remove();
-
     arrayData.forEach(row => {
         const $tr = $('<tr></tr>');
-        $tr.append(`<td>${checkAndHighlightText(row.customer_group, searchValue)}</td>`);
-        $tr.append(`<td>${checkAndHighlightText(row.customer_code, searchValue)}</td>`);
-        $tr.append(`<td>${checkAndHighlightText(row.order_type, searchValue)}</td>`);
-        $tr.append(`<td>${checkAndHighlightText(row.customer_order_number, searchValue)}</td>`);
-        $tr.append(`<td>${checkAndHighlightText(row.order_id?.trim(), searchValue)}</td>`);
-        $tr.append(`<td>${checkAndHighlightText(row.lop, searchValue)}</td>`);
+        $tr.append(`<td title="${row.customer_group}">${checkAndHighlightText(row.customer_group, searchValue)}</td>`);
+        $tr.append(`<td title="${row.customer_code}">${checkAndHighlightText(row.customer_code, searchValue)}</td>`);
+        $tr.append(`<td title="${row.order_type}">${checkAndHighlightText(row.order_type, searchValue)}</td>`);
+        $tr.append(`<td title="${row.customer_order_number}">${checkAndHighlightText(row.customer_order_number, searchValue)}</td>`);
+        $tr.append(`<td title="${row.order_id}">${checkAndHighlightText(row.order_id?.trim(), searchValue)}</td>`);
+        $tr.append(`<td title="${row.lop}">${checkAndHighlightText(row.lop, searchValue)}</td>`);
         $tr.append(`<td><a data-filter="Packing" href="javascript:void(0)">${checkAndHighlightText(row.packing, searchValue)}</a></td>`);
         $tr.append(`<td><a data-filter="Non Moving" href="javascript:void(0)">${checkAndHighlightText(row.non_moving, searchValue)}</a></td>`);
         $tr.append(`<td><a data-filter="Repairing"  href="javascript:void(0)">${checkAndHighlightText(row.repairing, searchValue)}</a></td>`);

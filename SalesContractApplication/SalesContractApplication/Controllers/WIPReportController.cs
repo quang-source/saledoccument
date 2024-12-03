@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 using SalesContractApplication.API;
+using SalesContractApplication.Models;
 
 namespace SalesContractApplication.Controllers
 {
@@ -28,10 +30,38 @@ namespace SalesContractApplication.Controllers
             {
                 return Json(null);
             }
-            string url = $"{_apiLink}/get-wip-report";
-            Models.ApiResponseModel apiResponse = await _apiServices.SendGetRequest(url, "", token);
-            return Json(apiResponse);
+
+            return Json(await GetWipReportHandle(token));
         }
+
+        [HttpGet]
+        public async Task<JsonResult> GetWipReportByCustOrder(string custOrder)
+        {
+            string? token = HttpContext.Session.GetString("Token");
+
+            if (token == null)
+            {
+                return Json(null);
+            }
+
+            return Json(await GetWipReportHandle(token, custOrder));
+        }
+
+        private async Task<ApiResponseModel> GetWipReportHandle(string token, string custOrder = "")
+        {
+            string jsonData = "{}";
+            if (!string.IsNullOrEmpty(custOrder))
+            {
+                var parameter = new
+                {
+                    customer_order_number = custOrder
+                };
+                jsonData = JsonConvert.SerializeObject(parameter);
+            }
+            string url = $"{_apiLink}/get-wip-report";
+            return await _apiServices.SendPostRequest(url, jsonData, token);
+        }
+
         [HttpPost]
         public async Task<JsonResult> GetWipReport_detail(string group, string customer, string orderType, string custOrder, string orderID, string LOP, string currentStep)
         {

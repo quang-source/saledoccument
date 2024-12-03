@@ -1,6 +1,11 @@
 ﻿@model SalesContractApplication.Models.WIPReportViewModel
 <link href="~/css/wip.css" rel="stylesheet" />
 <link href="~/css/bootstrap-icons.css" rel="stylesheet" />
+<style>
+    body {
+        overflow-y: hidden;
+    }
+</style>
 @{
     ViewBag.Title = "WIP Report";
 }
@@ -208,7 +213,7 @@
                             const cellValue = $cell.clone().find('span').remove().end().text().trim();
                             $('#cellDetailsModalLabel').html(` <strong>Customer:</strong> ${customer}<br/> 
                             <strong>Customer Order Number:</strong> ${custOrder}<br/> 
-                            <strong>Current Step:</strong> ${columnKey} ( ${cellValue} pcs) `);
+                            <strong>Current Step:</strong> ${columnKey} (${cellValue} pcs) `);
                             $('#cellDetailsModal').modal('show');
                         } else {
                             showToast('error', 'Can Not find Wip Report data : ' + result.error);

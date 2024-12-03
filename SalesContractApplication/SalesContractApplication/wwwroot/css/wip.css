@@ -1,6 +1,4 @@
-﻿body {
-    overflow-y: hidden;
-}
+﻿
 
 table {
     width: 100%;
@@ -20,7 +18,7 @@ td,th {
 }
 thead {
     position: sticky; /* Makes the header sticky */
-    top: 0px; /* Sticks to the top of the container */
+    top: -4px; /* Sticks to the top of the container */
     z-index: 997; /* Ensures it stays above other rows */
     background-color: cadetblue !important;
     cursor: pointer
